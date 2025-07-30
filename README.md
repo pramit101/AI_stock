@@ -32,11 +32,11 @@ This project aims to automate the estimation of stock levels for supermarket fre
 
 | Name           | Role                        |
 |----------------|-----------------------------|
-| Pramit Gautam  | Frontend Developer
-| Anandhu Binish | AI training and              |
-| Member 3       | [e.g., AI Researcher]        |
-| Member 4       | [e.g., UI/UX Designer]       |
-| Member 5       | [e.g., Project Coordinator]  |
+| Pramit Gautam  | Developer
+| Anandhu Binish | AI training             |
+| Ezekiel Pretty     | Cyber Security      |
+| Queen Bajracharya   | Developer      |
+| Member 5       | -  |
 
 
 ### Setup Instructions
