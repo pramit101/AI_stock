@@ -36,7 +36,7 @@ This project aims to automate the estimation of stock levels for supermarket fre
 | Anandhu Binish | AI training             |
 | Ezekiel Pretty     | Cyber Security      |
 | Queen Bajracharya   | Developer      |
-| Member 5       | -  |
+| Stacey Jepkemoi       | Developer  |
 
 
 ### Setup Instructions
