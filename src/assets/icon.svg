@@ -1,0 +1,9 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pentagon -->
+  <polygon points="32 4 60 20 50 56 14 56 4 20" fill="#0A74DA" stroke="#00FFC8" stroke-width="3"/>
+  <!-- Eye shape -->
+  <ellipse cx="32" cy="36" rx="14" ry="8" fill="none" stroke="#00FFC8" stroke-width="2"/>
+  <circle cx="32" cy="36" r="4" fill="#00FFC8"/>
+  <!-- Arrow (stock up) -->
+  <polyline points="26 38 32 30 38 38" stroke="#00FFC8" stroke-width="2" fill="none" stroke-linejoin="round"/>
+</svg>
