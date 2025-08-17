@@ -1,5 +1,9 @@
 #root{
 text-align: center;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+
 }
 
 #main_text {
@@ -17,4 +21,28 @@ text-align: center;
 img{
   width: 200px;
   height: 200px;
+}
+
+.upload-section {
+  margin: 20px 0;
+}
+
+.results {
+  margin-top: 30px;
+}
+
+.results table {
+  margin: 0 auto;
+  border-collapse: collapse;
+  width: 80%;
+}
+
+.results th,
+.results td {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.results th {
+  background-color: #f4f4f4;
 }

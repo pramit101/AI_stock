@@ -1,29 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import "./App.css";
 
 export default function LoopingText() {
   const textRef = useRef<HTMLDivElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (!textRef.current) return;
 
-    // Duplicate the text content so it loops seamlessly
-    const element = textRef.current;
-
-    gsap.to(element, {
+    // Animate text color pulsing
+    gsap.to(textRef.current, {
       duration: 1,
       color: "#ff0000",
       repeat: -1,
       yoyo: true,
       ease: "power1.inOut",
     });
-    gsap.to("#logo", {
-      rotation: 360, // degrees
-      transformOrigin: "50% 50%", // center point of SVG
-      duration: 4, // seconds per full rotation
-      repeat: -1, // loop forever
-      ease: "linear", // constant speed
+
+    // Rotate logo infinitely
+    gsap.to("#logo img", {
+      rotation: 360,
+      transformOrigin: "50% 50%",
+      duration: 4,
+      repeat: -1,
+      ease: "linear",
     });
   }, []);
 
@@ -36,6 +37,48 @@ export default function LoopingText() {
         <div ref={textRef} style={{ display: "inline-block" }}>
           TEAM PENTAVISION
         </div>
+      </div>
+
+      {/* Upload Section */}
+      <div className="upload-section">
+        <input
+          type="file"
+          onChange={(e) =>
+            setSelectedFile(e.target.files ? e.target.files[0] : null)
+          }
+        />
+        <p>
+          {selectedFile
+            ? `Selected file: ${selectedFile.name}`
+            : "No file selected"}
+        </p>
+      </div>
+
+      {/* Results Table Placeholder */}
+      <div className="results">
+        <h2>Results</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>File Name</th>
+              <th>Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {selectedFile ? (
+              <tr>
+                <td>{selectedFile.name}</td>
+                <td>Uploaded</td>
+                <td>Processing...</td>
+              </tr>
+            ) : (
+              <tr>
+                <td colSpan={3}>No results yet</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </>
   );
