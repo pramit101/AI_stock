@@ -1,5 +1,9 @@
 #root{
 text-align: center;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+
 }
 
 #main_text {
@@ -17,4 +21,129 @@ text-align: center;
 img{
   width: 200px;
   height: 200px;
+}
+
+.app-container {
+  background-color: white;
+  min-height: 100vh;
+}
+
+.header-text {
+  font-size: 36px;
+  font-weight: bold;
+  color: #007bff;
+}
+
+/* Upload Section */
+.upload-section {
+  border: 2px dashed #ccc;
+  border-radius: 16px;
+  padding: 40px;
+  margin: 0 auto 30px;
+  max-width: 500px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background-color: #f9f9f9;
+}
+.upload-section:hover {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+
+.upload-section small {
+  color: #333;
+}
+
+.upload-icon {
+  font-size: 60px;
+  margin-bottom: 15px;
+}
+.upload-text {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #333
+}
+.file-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.file-preview {
+  max-width: 250px;
+  max-height: 200px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.file-name {
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+.file-buttons {
+  display: flex;
+  gap: 10px;
+}
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.btn:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn.analyze {
+  background-color: #28a745;
+  color: white;
+}
+.btn.remove {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Results Table */
+.results {
+  max-width: 700px;
+  margin: 0 auto 50px;
+}
+.results h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+.results table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.results th,
+.results td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+  color: #333
+}
+.results th {
+  background-color: #f4f4f4;
+}
+.even-row {
+  background-color: #f9f9f9;
+}
+.odd-row {
+  background-color: #ffffff;
+}
+.loading-cell {
+  color: #007bff;
+  font-style: italic;
+}
+.no-results {
+  color: #666;
+  font-style: italic;
 }
