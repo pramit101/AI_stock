@@ -1,69 +1,113 @@
-# React + TypeScript + Vite
+# AI-Powered Stock Level Estimation for Supermarkets
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project explores the use of **AI and computer vision** to automatically estimate stock levels of supermarket products (e.g., bananas, broccoli, onions) from camera feeds or uploaded images. The system helps reduce manual labor by providing automated shelf monitoring and stock reporting.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- **AI-powered stock estimation** from photos/videos of supermarket shelves  
+- **Frontend Web App** built with **React + Vite** for fast and modern UI  
+- **Backend API** using **Node.js + Express** to handle requests and manage communication between frontend, Firebase, and AI engine  
+- **AI Engine** leveraging **open-source models** (running on Linux server) for image segmentation, vision-language analysis, and depth estimation  
+- **Firebase Storage** for storing user uploads (photos/videos) and results  
+- **Results Table** showing estimated stock levels (e.g., 20%, 50%, Overstocked)  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- **Frontend**: React + Vite  
+- **Backend**: Node.js + Express  
+- **Storage**: Firebase  
+- **AI Integration**: Python (open-source models running on Linux server)  
+- **Hosting/Infrastructure**: Linux server for AI backend and model inference  
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+##  Project Structure (suggested)
+
+```
+root/
+│── frontend/          # React + Vite web app
+│── backend/           # Node.js + Express API
+│   ├── routes/        # API routes
+│   ├── controllers/   # Request handling
+│   └── services/      # Firebase + AI service handlers
+│── ai-engine/         # Python-based AI scripts/models
+│── docs/              # Documentation
+│── README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+##  Setup Instructions
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Clone the Repository
+```bash
+git clone <repo-url>
+cd <repo-name>
 ```
+
+### 2. Frontend Setup (React + Vite)
+```bash
+cd frontend
+npm install
+npm run dev   # Start development server
+```
+
+### 3. Backend Setup (Node.js + Express)
+```bash
+cd backend
+npm install
+npm run dev   # Start backend server
+```
+
+### 4. AI Engine Setup (Python)
+```bash
+cd ai-engine
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python main.py   # Run AI engine
+```
+
+### 5. Firebase Setup
+- Create a Firebase project  
+- Enable **Cloud Storage** and **Firestore** if needed  
+- Add your `firebaseConfig` in `frontend/src/config/firebase.js`  
+
+---
+
+##  Workflow
+
+1. User uploads image/video through the frontend  
+2. File is stored in **Firebase Storage**  
+3. Backend sends request to **AI engine (Python)** for processing  
+4. AI engine estimates stock levels and returns structured data  
+5. Backend sends results back to frontend  
+6. User sees results in a **table format**  
+
+---
+
+##  Roadmap
+
+- ✅ Prototype with open-source AI models  
+- ✅ Basic frontend + backend integration  
+- ⬜ Extend AI to support more product categories  
+- ⬜ Improve accuracy with curated datasets  
+- ⬜ (Optional) Train a custom AI model for supermarket stock monitoring  
+
+---
+
+##  License & Ownership
+
+All developed materials belong to **La Trobe University**.  
+
+## Members:
+
+Pramit Gautam - Developer
+Queen Bajracharya - Developer
+Ezekeil Pretty - Cybersecurity
+Stacey Jepkemoi - Developer
+Anandhu Binish - AI Engineer
