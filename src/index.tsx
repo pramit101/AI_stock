@@ -1,5 +1,4 @@
-import './index.css';
-import React from "react";
+import "./index.css";
 import { render } from "react-dom";
-import { App } from "./App";
-render(<App />, document.getElementById("root"));
+import { AppRouter } from "./AppRouter";
+render(<AppRouter />, document.getElementById("root"));
