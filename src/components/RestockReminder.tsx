@@ -16,7 +16,7 @@ type RestockReminderProps = {
 
 function normalizePercent(v: number): number {
   if (typeof v !== "number" || Number.isNaN(v)) return 0;
-  const n = v <= 1 ? v * 100 : v;              // accept 0–1 or 0–100
+  const n = v <= 1 ? v * 100 : v; // accept 0–1 or 0–100
   return Math.max(0, Math.min(100, Math.round(n)));
 }
 
@@ -88,42 +88,42 @@ export function RestockReminder({
 
   if (!lowest) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 text-center text-sm text-gray-500">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow p-4 text-center text-sm text-gray-500 dark:text-gray-400">
         No items to display
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow h-full flex flex-col">
-      <div className="p-3 border-b bg-red-50">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow h-full flex flex-col text-gray-900 dark:text-gray-100">
+      <div className="p-3 border-b border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/50 rounded-t-lg">
         <div className="flex items-center">
-          <AlertCircleIcon size={20} className="text-red-600 mr-2" />
-          <h3 className="text-lg font-medium text-red-700">
+          <AlertCircleIcon size={20} className="text-red-600 dark:text-red-400 mr-2" />
+          <h3 className="text-lg font-medium text-red-700 dark:text-red-300">
             Urgent Restock Required
           </h3>
         </div>
-        <p className="text-xs text-red-600">{subtitle}</p>
+        <p className="text-xs text-red-600 dark:text-red-400">{subtitle}</p>
       </div>
 
       <div className="p-4 flex-1 flex flex-col justify-center">
         <div className="text-center mb-2">
-          <span className="text-xl font-bold text-gray-900">{lowest.name}</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-gray-100">{lowest.name}</span>
         </div>
 
         <div className="flex justify-between text-sm mb-1">
-          <span>Current Stock</span>
-          <span className="font-medium">{lowest.percent}%</span>
+          <span className="text-gray-700 dark:text-gray-300">Current Stock</span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">{lowest.percent}%</span>
         </div>
 
-        <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-4 mb-2">
           <div
             className="h-4 rounded-full bg-red-500"
             style={{ width: `${lowest.percent}%` }}
           />
         </div>
 
-        <div className="text-xs text-gray-500 text-center">
+        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
           This item needs to be stocked.
         </div>
       </div>

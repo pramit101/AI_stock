@@ -44,6 +44,10 @@ function usePollingData(endpoint?: string, intervalMs = 4000) {
   return data;
 }
 
+function isDark() {
+  return typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+}
+
 export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduceChartProps) {
   const polled = usePollingData(endpoint, intervalMs);
 
@@ -68,8 +72,20 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
   }, [topProduceData]);
 
   const nameToColor = FIXED_COLORS; // lock colors to the palette you provided
-
   const onPieEnter = (_: any, index: number) => setActiveIndex(index);
+
+  const dark = isDark();
+  const tooltipStyles = {
+    contentStyle: {
+      background: dark ? "#3869d3ff" : "#ffffff",
+      border: `1px solid ${dark ? "#374151" : "#e5e7eb"}`,
+      borderRadius: 8,
+      color: dark ? "#e5e7eb" : "#111827",
+      fontSize: 12,
+    },
+    labelStyle: { color: dark ? "#e5e7eb" : "#111827", fontSize: 12 },
+    itemStyle: { color: dark ? "#d1d5db" : "#374151", fontSize: 12 },
+  };
 
   const renderActiveShape = (props: any) => {
     const RADIAN = Math.PI / 180;
@@ -84,6 +100,9 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
     const ey = my;
     const textAnchor = cos >= 0 ? "start" : "end";
 
+    const primaryText = dark ? "#e5e7eb" : "#333333";
+    const secondaryText = dark ? "#9ca3af" : "#999999";
+
     return (
       <g>
         <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill} className="text-xs font-medium">
@@ -95,10 +114,10 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
                 innerRadius={outerRadius + 6} outerRadius={outerRadius + 10} fill={fill} />
         <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
         <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333" className="text-xs">
+        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill={primaryText} className="text-xs">
           {`${value} units`}
         </text>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999" className="text-xs">
+        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill={secondaryText} className="text-xs">
           {`(${(percent * 100).toFixed(0)}%)`}
         </text>
       </g>
@@ -106,67 +125,68 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
   };
 
   return (
-    <div className="bg-white rounded-lg shadow h-full flex flex-col">
-      <div className="p-3 border-b">
-        <h3 className="text-lg font-medium">Popular Produce</h3>
-        <p className="text-xs text-gray-500">By sales volume</p>
+    <div className="card rounded-xl shadow-lg h-full flex flex-col">
+      <div className="p-4 border-b border-opacity-20 border-gray-300 dark:border-gray-600">
+        <h3 className="text-lg font-semibold">Popular Produce</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">By sales volume</p>
       </div>
 
-      <div className="p-2 flex-1 flex flex-col">
-        <div className="h-1/2">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                activeIndex={activeIndex}
-                activeShape={renderActiveShape}
-                data={topProduceData}
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={60}
-                dataKey="value"
-                onMouseEnter={onPieEnter}
-                paddingAngle={5}
-              >
-                {topProduceData.map((entry, index) => (
-                  <Cell key={`cell-${entry.name}-${index}`} fill={nameToColor[entry.name] || "#999"} stroke="none" />
-                ))}
-              </Pie>
-              <Tooltip formatter={(v: any) => [`${v} units`, "Sales"]} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Legend table (no scroll; always show all items) */}
-        <div className="mt-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Sales</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {topProduceData.map((item, index) => (
-                <tr
-                  key={`${item.name}-${index}`}
-                  className="hover:bg-gray-50 cursor-pointer"
-                  onMouseEnter={() => setActiveIndex(index)}
+      <div className="p-4 flex-1 flex flex-col min-h-0">
+        <div className="h-full text-inherit min-h-0 flex flex-col">
+          {/* Chart takes top section with more space */}
+          <div className="flex-1 min-h-0 mb-6">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  activeIndex={activeIndex}
+                  activeShape={renderActiveShape}
+                  data={topProduceData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={30}
+                  outerRadius={50}
+                  dataKey="value"
+                  onMouseEnter={onPieEnter}
+                  paddingAngle={2}
                 >
-                  <td className="py-1">
-                    <div className="flex items-center">
-                      <span
-                        className="h-2 w-2 rounded-full mr-2"
-                        style={{ backgroundColor: nameToColor[item.name] || "#999" }}
-                      />
-                      <span className="text-xs font-medium">{item.name}</span>
-                    </div>
-                  </td>
-                  <td className="py-1 text-right text-xs">{item.value} units</td>
+                  {topProduceData.map((entry, index) => (
+                    <Cell key={`cell-${entry.name}-${index}`} fill={nameToColor[entry.name] || "#999"} stroke="none" />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v: any) => [`${v} units`, "Sales"]} {...tooltipStyles} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          
+          {/* Legend table below the chart with compact spacing */}
+          <div className="flex-shrink-0">
+            <table className="min-w-full">
+              <thead>
+                <tr>
+                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider py-1">Item</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-opacity-20 divide-gray-300 dark:divide-gray-600">
+                {topProduceData.map((item, index) => (
+                  <tr
+                    key={`${item.name}-${index}`}
+                    className="hover:bg-opacity-50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 cursor-pointer"
+                    onMouseEnter={() => setActiveIndex(index)}
+                  >
+                    <td className="py-1">
+                      <div className="flex items-center">
+                        <span
+                          className="h-2.5 w-2.5 rounded-full mr-2 flex-shrink-0"
+                          style={{ backgroundColor: nameToColor[item.name] || "#999" }}
+                        />
+                        <span className="text-xs font-medium truncate">{item.name}</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
