@@ -1,64 +1,101 @@
-import React from 'react';
-import { AlertCircleIcon, CameraIcon } from 'lucide-react';
-interface RestockReminderProps {
-  restockedItems: number[];
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AlertCircleIcon } from "lucide-react";
+
+type PercentMap = Record<string, number>;
+
+type RestockReminderProps = {
+  /** Controlled AI input: { Apples: 0.32 | 32, Bananas: 0.78 | 78, ... } */
+  percents?: PercentMap;
+  /** Optional: poll an endpoint that returns the same shape as `percents` */
+  endpoint?: string;
+  /** Poll interval (ms) used only when `endpoint` is provided */
+  intervalMs?: number;
+  /** Optional: label to show under the title (e.g., "From AI analysis") */
+  subtitle?: string;
+};
+
+function normalizePercent(v: number): number {
+  if (typeof v !== "number" || Number.isNaN(v)) return 0;
+  const n = v <= 1 ? v * 100 : v;              // accept 0–1 or 0–100
+  return Math.max(0, Math.min(100, Math.round(n)));
 }
+
+function usePolledPercents(endpoint?: string, intervalMs = 5000) {
+  const [data, setData] = useState<PercentMap | null>(null);
+  const timerRef = useRef<number | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    if (!endpoint) return;
+
+    const fetchOnce = async () => {
+      try {
+        abortRef.current?.abort();
+        abortRef.current = new AbortController();
+        const res = await fetch(endpoint, { signal: abortRef.current.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = (await res.json()) as PercentMap;
+        setData(json ?? {});
+      } catch {
+        // ignore errors to keep polling
+      }
+    };
+
+    fetchOnce();
+    timerRef.current = window.setInterval(fetchOnce, intervalMs) as unknown as number;
+    return () => {
+      if (timerRef.current) window.clearInterval(timerRef.current);
+      abortRef.current?.abort();
+    };
+  }, [endpoint, intervalMs]);
+
+  return data;
+}
+
 export function RestockReminder({
-  restockedItems
+  percents,
+  endpoint,
+  intervalMs = 5000,
+  subtitle = "Lowest stock item",
 }: RestockReminderProps) {
-  // Mock data for restock reminders
-  const restockItems = [{
-    id: 3,
-    name: 'Fresh Strawberries',
-    currentStock: 32,
-    maxCapacity: 100,
-    restockThreshold: 40
-  }, {
-    id: 4,
-    name: 'Hass Avocados',
-    currentStock: 53,
-    maxCapacity: 150,
-    restockThreshold: 60
-  }, {
-    id: 1,
-    name: 'Organic Bananas',
-    currentStock: 145,
-    maxCapacity: 200,
-    restockThreshold: 50
-  }, {
-    id: 2,
-    name: 'Gala Apples',
-    currentStock: 87,
-    maxCapacity: 200,
-    restockThreshold: 40
-  }, {
-    id: 5,
-    name: 'Organic Carrots',
-    currentStock: 78,
-    maxCapacity: 150,
-    restockThreshold: 60
-  }];
-  // Find the most urgent item (lowest percentage of stock)
-  const getMostUrgentItem = () => {
-    // Filter out restocked items
-    const availableItems = restockItems.filter(item => !restockedItems.includes(item.id));
-    // If all items have been restocked, show the first item at 100%
-    if (availableItems.length === 0) {
-      return {
-        ...restockItems[0],
-        currentStock: restockItems[0].maxCapacity // Set to max capacity (100%)
-      };
-    }
-    return [...availableItems].sort((a, b) => {
-      const percentA = a.currentStock / a.maxCapacity * 100;
-      const percentB = b.currentStock / b.maxCapacity * 100;
-      return percentA - percentB;
-    })[0];
-  };
-  const mostUrgentItem = getMostUrgentItem();
-  const isRestocked = restockedItems.includes(mostUrgentItem.id);
-  const stockPercentage = isRestocked ? 100 : mostUrgentItem.currentStock / mostUrgentItem.maxCapacity * 100;
-  return <div className="bg-white rounded-lg shadow h-full flex flex-col">
+  const polled = usePolledPercents(endpoint, intervalMs);
+
+  // Source of truth: controlled > polled > fallback zeros for six standard items
+  const percentMap = useMemo<PercentMap>(() => {
+    if (percents && Object.keys(percents).length) return percents;
+    if (polled && Object.keys(polled).length) return polled;
+    // fallback so the card renders before AI connects
+    return {
+      Apples: 0,
+      Bananas: 0,
+      Cucumbers: 0,
+      Carrots: 0,
+      Potatoes: 0,
+      Tomatoes: 0,
+    };
+  }, [percents, polled]);
+
+  // Find the lowest percentage item
+  const lowest = useMemo(() => {
+    const entries = Object.entries(percentMap).map(([name, v]) => ({
+      name,
+      percent: normalizePercent(v),
+    }));
+    if (!entries.length) return null;
+    entries.sort((a, b) => a.percent - b.percent);
+    return entries[0];
+  }, [percentMap]);
+
+  if (!lowest) {
+    return (
+      <div className="bg-white rounded-lg shadow p-4 text-center text-sm text-gray-500">
+        No items to display
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow h-full flex flex-col">
       <div className="p-3 border-b bg-red-50">
         <div className="flex items-center">
           <AlertCircleIcon size={20} className="text-red-600 mr-2" />
@@ -66,52 +103,30 @@ export function RestockReminder({
             Urgent Restock Required
           </h3>
         </div>
-        <p className="text-sm text-red-600">
-          The following item needs immediate attention
-        </p>
+        <p className="text-xs text-red-600">{subtitle}</p>
       </div>
-      <div className="p-4 flex flex-col items-center justify-center flex-1">
-        <div className="w-full">
-          <div className="text-center mb-2">
-            <span className="text-xl font-bold text-gray-900">
-              {mostUrgentItem.name}
-            </span>
-          </div>
-          <div className="flex justify-between text-sm mb-1">
-            <span>Current Stock</span>
-            <span className="font-medium">
-              {stockPercentage.toFixed(0)}% remaining
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-            <div className={`h-4 rounded-full ${isRestocked ? 'bg-green-500' : 'bg-red-500 animate-pulse'}`} style={{
-            width: `${stockPercentage}%`
-          }}></div>
-          </div>
-          <div className="text-center">
-            {!isRestocked ? <>
-                <div className="text-sm text-gray-500 mb-3">
-                  <strong className="text-red-600">Critical level:</strong> Only{' '}
-                  {mostUrgentItem.currentStock} of {mostUrgentItem.maxCapacity}{' '}
-                  units remaining
-                </div>
-                <div className="p-3 border border-dashed border-gray-300 rounded-lg bg-gray-50 mb-3">
-                  <div className="flex flex-col items-center">
-                    <CameraIcon size={36} className="text-gray-400 mb-2" />
-                    <p className="text-center text-xs text-gray-600">
-                      To restock this item, please take a photo of the fully
-                      stocked shelf using the verify button
-                    </p>
-                  </div>
-                </div>
-              </> : <div className="text-sm text-green-600 font-medium mb-3">
-                ✓ This item has been successfully restocked to 100%
-              </div>}
-            <div className="text-xs text-gray-500 italic">
-              Last checked: Today at 11:23 AM
-            </div>
-          </div>
+
+      <div className="p-4 flex-1 flex flex-col justify-center">
+        <div className="text-center mb-2">
+          <span className="text-xl font-bold text-gray-900">{lowest.name}</span>
+        </div>
+
+        <div className="flex justify-between text-sm mb-1">
+          <span>Current Stock</span>
+          <span className="font-medium">{lowest.percent}%</span>
+        </div>
+
+        <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
+          <div
+            className="h-4 rounded-full bg-red-500"
+            style={{ width: `${lowest.percent}%` }}
+          />
+        </div>
+
+        <div className="text-xs text-gray-500 text-center">
+          This item needs to be stocked.
         </div>
       </div>
-    </div>;
+    </div>
+  );
 }
