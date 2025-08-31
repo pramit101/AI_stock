@@ -25,14 +25,14 @@ function Header({
 
   return (
     <header
-      className="bg-white dark:bg-gray-900 shadow-sm sticky top-0 z-10 transition-all duration-300 border-b border-gray-200 dark:border-gray-800"
+      className="header sticky top-0 z-10 transition-all duration-300 border-b border-gray-200 dark:border-gray-800"
       style={{ marginLeft: offset }}
     >
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center">
           <button
             onClick={open ? onClose : onOpen}
-            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none"
+            className="p-2 rounded-md header-hover focus:outline-none"
             aria-label={open ? "Collapse sidebar" : "Expand sidebar"}
             aria-pressed={open}
           >
@@ -54,7 +54,7 @@ function Header({
           {/* Theme Toggle */}
           <AnimatedThemeToggler />
 
-          <button className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 relative" aria-label="Notifications">
+          <button className="p-2 rounded-md header-hover relative" aria-label="Notifications">
             <BellIcon size={20} className="text-gray-800 dark:text-gray-200" />
             <span className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2" />
           </button>
@@ -86,7 +86,7 @@ function Sidebar({ open }: { open: boolean }) {
   return (
     <aside
       /* Light mode: bluish | Dark mode: charcoal */
-      className="fixed top-0 left-0 h-screen bg-blue-700 dark:bg-gray-950 text-white z-20 transition-all duration-300 flex flex-col border-r border-blue-800 dark:border-gray-800"
+      className="fixed top-0 left-0 h-screen sidebar text-white z-20 transition-all duration-300 flex flex-col border-r border-blue-800 dark:border-gray-800"
       style={{ width }}
       aria-label="Primary"
       aria-expanded={open}
@@ -118,8 +118,8 @@ function Sidebar({ open }: { open: boolean }) {
                   to={item.to}
                   className={`flex items-center px-3 py-2 rounded-md transition-colors
                     ${active
-                      ? "bg-blue-800 dark:bg-gray-800"
-                      : "hover:bg-blue-800 dark:hover:bg-gray-800"}`}
+                      ? "sidebar-active"
+                      : "hover:sidebar-hover"}`}
                   aria-current={active ? "page" : undefined}
                   title={open ? undefined : item.name}
                 >
@@ -142,7 +142,7 @@ function Sidebar({ open }: { open: boolean }) {
       <div className="p-3 border-t border-blue-800 dark:border-gray-800">
         <button
           type="button"
-          className="w-full flex items-center px-3 py-2 rounded-md text-left transition-colors hover:bg-blue-800 dark:hover:bg-gray-800"
+          className="w-full flex items-center px-3 py-2 rounded-md text-left transition-colors hover:sidebar-hover"
           title={open ? undefined : "Help"}
         >
           <HelpCircleIcon size={20} className="mr-3 shrink-0" />
@@ -156,13 +156,13 @@ function Sidebar({ open }: { open: boolean }) {
         </button>
         <button
           type="button"
-          className="w-full flex items-center px-3 py-2 rounded-md text-left mt-2 transition-colors hover:bg-blue-800 dark:hover:bg-gray-800"
+          className="w-full flex items-center px-3 py-2 rounded-md text-left mt-2 transition-colors hover:sidebar-hover"
           title={open ? undefined : "Logout"}
         >
           <LogOutIcon size={20} className="mr-3 shrink-0" />
           <span
             className={`transition-opacity duration-200 ${
-              open ? "opacity-0 pointer-events-none" : "opacity-100"
+              open ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
           >
             Logout
@@ -197,7 +197,7 @@ export function Shell() {
   const sidebarWidth = open ? SIDEBAR_WIDTH_PX : SIDEBAR_RAIL_WIDTH_PX;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen main">
       {/* Sidebar */}
       <Sidebar open={open} />
 
@@ -210,7 +210,7 @@ export function Shell() {
 
       {/* Main */}
       <main
-        className="bg-gray-50 dark:bg-gray-900 p-4 transition-all duration-300 min-h-[calc(100vh-40px)] text-gray-900 dark:text-gray-100"
+        className="main p-4 transition-all duration-300 min-h-[calc(100vh-40px)]"
         style={{ marginLeft: sidebarWidth }}
       >
         <Outlet />

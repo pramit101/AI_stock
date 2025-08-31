@@ -4,7 +4,7 @@ import { Shell } from "./components/Shell";
 
 import HomePage from "./pages/HomePage";
 import Upload from "./pages/Upload";
-import { Inventory } from "./pages/Inventory";
+import Inventory from "./pages/Inventory";
 import Report from "./pages/Report";
 import Settings from "./pages/Settings";
 import { Apples } from "./pages/Apples";

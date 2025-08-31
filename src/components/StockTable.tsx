@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CameraIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface StockTableProps {
   onItemRestocked: (itemId: number) => void;
@@ -73,7 +74,7 @@ export function StockTable({ onItemRestocked }: StockTableProps) {
   };
 
   return (
-    <div className="flex flex-col h-full main">
+    <div className="flex flex-col h-full">
       <div className="flex justify-between items-center p-4 border-b border-opacity-20 border-gray-300 dark:border-gray-600">
         <h2 className="text-lg font-semibold">Most Stocked Produce</h2>
         <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -114,7 +115,12 @@ export function StockTable({ onItemRestocked }: StockTableProps) {
               return (
                 <tr key={item.id} className="hover:bg-opacity-50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium main">{item.name}</div>
+                    <Link 
+                      to={`/inventory/${item.name.toLowerCase()}`}
+                      className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-pointer"
+                    >
+                      {item.name}
+                    </Link>
                   </td>
 
                   <td className="px-4 py-4 whitespace-nowrap">
