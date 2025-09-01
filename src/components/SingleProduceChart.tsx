@@ -5,17 +5,19 @@ import {
 
 // ---------- Types ----------
 type RangeKey = "day" | "week" | "month";
-type Point = {
+type SinglePoint = {
   time: string;
-  apples: number; bananas: number; cucumbers: number;
-  carrots: number; potatoes: number; tomatoes: number;
+  value: number;
 };
-type RangeData = { day?: Point[]; week?: Point[]; month?: Point[] };
+type SingleRangeData = { day?: SinglePoint[]; week?: SinglePoint[]; month?: SinglePoint[] };
 
-type StockChartsProps = {
+type SingleProduceChartProps = {
+  produceName: string;
+  produceKey: string;
+  produceColor: string;
   /** Option A: controlled data from parent (push AI updates into these arrays) */
-  data?: RangeData;
-  /** Option B: polling endpoint that returns Point[]; we call /endpoint?range=<day|week|month> */
+  data?: SingleRangeData;
+  /** Option B: polling endpoint that returns SinglePoint[]; we call /endpoint?range=<day|week|month>&produce=<produceKey> */
   endpoint?: string;
   /** Polling interval (used only when endpoint provided) */
   intervalMs?: number;
@@ -24,30 +26,16 @@ type StockChartsProps = {
 };
 
 // ---------- Helpers ----------
-const PRODUCE_KEYS = [
-  { key: "apples",     label: "Apples",     color: "#eb4031ff" },
-  { key: "bananas",    label: "Bananas",    color: "#cedd2cff" },
-  { key: "cucumbers",  label: "Cucumbers",  color: "#3fa21fff" },
-  { key: "carrots",    label: "Carrots",    color: "#ea9a10ff" },
-  { key: "potatoes",   label: "Potatoes",   color: "#4f3ee7ff" },
-  { key: "tomatoes",   label: "Tomatoes",   color: "#910c7fff" },
-] as const;
-
 function clampPct(n: number) {
   if (Number.isNaN(n)) return 0;
   return Math.max(0, Math.min(100, n));
 }
 
-function normalizeSeries(points: any[] | undefined): Point[] {
+function normalizeSingleSeries(points: any[] | undefined): SinglePoint[] {
   if (!Array.isArray(points)) return [];
   return points.map((p) => ({
     time: String(p.time ?? ""),
-    apples: clampPct(Number(p.apples)),
-    bananas: clampPct(Number(p.bananas)),
-    cucumbers: clampPct(Number(p.cucumbers)),
-    carrots: clampPct(Number(p.carrots)),
-    potatoes: clampPct(Number(p.potatoes)),
-    tomatoes: clampPct(Number(p.tomatoes)),
+    value: clampPct(Number(p.value ?? 0)),
   }));
 }
 
@@ -56,8 +44,8 @@ function isDark() {
   return typeof document !== "undefined" && document.documentElement.classList.contains("dark");
 }
 
-function usePolledSeries(endpoint?: string, range: RangeKey = "day", intervalMs = 5000) {
-  const [series, setSeries] = useState<Point[]>([]);
+function usePolledSingleSeries(endpoint: string | undefined, range: RangeKey, produceKey: string, intervalMs = 5000) {
+  const [series, setSeries] = useState<SinglePoint[]>([]);
   const timerRef = useRef<number | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -68,11 +56,11 @@ function usePolledSeries(endpoint?: string, range: RangeKey = "day", intervalMs 
       try {
         abortRef.current?.abort();
         abortRef.current = new AbortController();
-        const url = `${endpoint}?range=${encodeURIComponent(range)}`;
+        const url = `${endpoint}?range=${encodeURIComponent(range)}&produce=${encodeURIComponent(produceKey)}`;
         const res = await fetch(url, { signal: abortRef.current.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-        setSeries(normalizeSeries(json));
+        setSeries(normalizeSingleSeries(json));
       } catch {
         // keep silent; continue polling
       }
@@ -85,60 +73,66 @@ function usePolledSeries(endpoint?: string, range: RangeKey = "day", intervalMs 
       if (timerRef.current) window.clearInterval(timerRef.current);
       abortRef.current?.abort();
     };
-  }, [endpoint, range, intervalMs]);
+  }, [endpoint, range, produceKey, intervalMs]);
 
   return series;
 }
 
 // ---------- Component ----------
-export function StockCharts({
+export function SingleProduceChart({
+  produceName,
+  produceKey,
+  produceColor,
   data,
   endpoint,
   intervalMs = 5000,
   initialRange = "day",
-}: StockChartsProps) {
+}: SingleProduceChartProps) {
   const [range, setRange] = useState<RangeKey>(initialRange);
 
   // A: controlled data -> choose current range
   const controlled = useMemo(() => {
     if (!data) return undefined;
     const list = data[range];
-    return normalizeSeries(list);
+    return normalizeSingleSeries(list);
   }, [data, range]);
 
   // B: polled data (when endpoint present)
-  const polled = usePolledSeries(endpoint, range, intervalMs);
+  const polled = usePolledSingleSeries(endpoint, range, produceKey, intervalMs);
 
-  // Source of truth
-  const chartData: Point[] = useMemo(() => {
+  // Source of truth - all data set to zero initially as requested
+  const chartData: SinglePoint[] = useMemo(() => {
     if (controlled && controlled.length) return controlled;
     if (polled && polled.length) return polled;
-    // fallback placeholder (so the card renders before AI data)
+    // fallback placeholder with zero data (as requested for AI integration)
     if (range === "day") {
       return [
-        { time: "7AM",  apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "10AM", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "1PM",  apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "4PM",  apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "7PM",  apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "10PM", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
+        { time: "6AM",  value: 0 },
+        { time: "8AM",  value: 0 },
+        { time: "10AM", value: 0 },
+        { time: "12PM", value: 0 },
+        { time: "2PM",  value: 0 },
+        { time: "4PM",  value: 0 },
+        { time: "6PM",  value: 0 },
+        { time: "8PM",  value: 0 },
+        { time: "10PM", value: 0 },
       ];
     }
     if (range === "week") {
       return [
-        { time:"Mon", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Tue", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Wed", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Thu", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Fri", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Sat", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Sun", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
+        { time: "Mon", value: 0 },
+        { time: "Tue", value: 0 },
+        { time: "Wed", value: 0 },
+        { time: "Thu", value: 0 },
+        { time: "Fri", value: 0 },
+        { time: "Sat", value: 0 },
+        { time: "Sun", value: 0 },
       ];
     }
-    // month (e.g., 1..30)
-    return Array.from({ length: 30 }, (_, i) => ({
+    // month (e.g., 1..31)
+    return Array.from({ length: 31 }, (_, i) => ({
       time: String(i + 1),
-      apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0,
+      value: 0,
     }));
   }, [controlled, polled, range]);
 
@@ -161,7 +155,7 @@ export function StockCharts({
     <div className="bg-white dark:bg-gray-900 rounded-lg shadow h-full flex flex-col text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-800">
       <div className="p-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium">Inventory Trends</h3>
+          <h3 className="text-lg font-medium">{produceName} Stock Trends</h3>
           <p className="text-xs text-gray-500 dark:text-gray-400">
             Stock levels ({range === "day" ? "throughout the day" : range === "week" ? "daily over the week" : "daily over the month"})
           </p>
@@ -201,18 +195,15 @@ export function StockCharts({
                 wrapperStyle={{ fontSize: "10px", color: "inherit" }}
                 formatter={(value) => <span style={{ color: "inherit" }}>{value}</span>}
               />
-              {PRODUCE_KEYS.map(({ key, label, color }) => (
-                <Line
-                  key={key}
-                  type="monotone"
-                  dataKey={key}
-                  name={label}
-                  stroke={color}
-                  strokeWidth={2}
-                  activeDot={{ r: 6 }}
-                  isAnimationActive={false}
-                />
-              ))}
+              <Line
+                type="monotone"
+                dataKey="value"
+                name={produceName}
+                stroke={produceColor}
+                strokeWidth={2}
+                activeDot={{ r: 6 }}
+                isAnimationActive={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
