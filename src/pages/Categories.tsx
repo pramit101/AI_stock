@@ -1,354 +1,188 @@
+import { useState } from "react";
 import { Sidebar } from "../components/Sidebar";
-import { useState, FormEvent, ChangeEvent } from "react";
 import { TitleHeader } from "../components/TitleHeader";
-import { Pie } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { AlertTriangle } from "lucide-react";
 
-// Product type
+// Define Product type
 interface Product {
   name: string;
   category: string;
-  stock: number;
+  stock: number; // percentage of shelf filled
 }
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+// Map product names to real images
+const productImages: { [key: string]: string } = {
+  Banana:
+    "https://media.istockphoto.com/id/1291262112/photo/banana.webp?a=1&b=1&s=612x612&w=0&k=20&c=KSmjx5R8Qk4mzzGw8tAP3CAPoSH_zdXD7sZYd1lBuD4=",
+  Apple:
+    "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=1024&q=80",
+  Cucumber:
+    "https://media.istockphoto.com/id/967491012/photo/whole-with-slice-cucumber-isolated-on-white-background.webp?a=1&b=1&s=612x612&w=0&k=20&c=LOEDxL1YeoPLmSqOGtwt-IBSYWYhMI7QKgAsqBByG1Q=",
+  Tomato:
+    "https://plus.unsplash.com/premium_photo-1726138646616-ec9fb0277048?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OXx8dG9tYXRvZXN8ZW58MHx8MHx8fDA%3D",
+  Carrot:
+    "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2Fycm90fGVufDB8fDB8fHww",
+  Potato:
+    "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cG90YXRvfGVufDB8fDB8fHww",
+};
 
 export default function Categories() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const handleCollapse = () => setSidebarCollapsed(!sidebarCollapsed);
 
-  // State for search, filters, products, editing, etc.
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("All");
-
-  const [products, setProducts] = useState<Product[]>([
+  const [products] = useState<Product[]>([
     { name: "Banana", category: "Fruits", stock: 65 },
-    { name: "Broccoli", category: "Vegetables", stock: 15 },
-    { name: "Onion", category: "Vegetables", stock: 90 },
     { name: "Apple", category: "Fruits", stock: 75 },
+    { name: "Cucumber", category: "Vegetables", stock: 40 },
+    { name: "Tomato", category: "Vegetables", stock: 55 },
     { name: "Carrot", category: "Vegetables", stock: 20 },
     { name: "Potato", category: "Vegetables", stock: 25 },
   ]);
 
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [editedProduct, setEditedProduct] = useState<Product | null>(null);
-  const [isAddingNew, setIsAddingNew] = useState<boolean>(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const [newProduct, setNewProduct] = useState<{
-    name: string;
-    category: string;
-    stock: string; // keep as string for input
-  }>({ name: "", category: "", stock: "" });
+  const handleProductClick = (product: Product) => setSelectedProduct(product);
+  const handleCloseModal = () => setSelectedProduct(null);
 
-  // Handlers for CRUD
-  const handleDelete = (productName: string) => {
-    setProducts(products.filter((p) => p.name !== productName));
-  };
+  const pieChartData = products.map((product) => ({
+    name: product.name,
+    value: product.stock,
+  }));
 
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setEditedProduct({ ...product });
-    setIsAddingNew(false);
-  };
+  const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#8dd1e1", "#d084d0"];
 
-  const handleSaveEdit = (e: FormEvent) => {
-    e.preventDefault();
-    if (editingProduct && editedProduct) {
-      setProducts(
-        products.map((p) =>
-          p.name === editingProduct.name ? editedProduct : p
-        )
-      );
-      setEditingProduct(null);
-      setEditedProduct(null);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingProduct(null);
-    setEditedProduct(null);
-  };
-
-  const handleAddNewProduct = (e: FormEvent) => {
-    e.preventDefault();
-    if (newProduct.name && newProduct.category && newProduct.stock) {
-      setProducts([
-        ...products,
-        { ...newProduct, stock: parseInt(newProduct.stock, 10) },
-      ]);
-      setNewProduct({ name: "", category: "", stock: "" });
-      setIsAddingNew(false);
-    }
-  };
-
-  // Filter products
-  const filteredProducts = products.filter((p) => {
-    const matchesSearch = p.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "All" || p.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Pie chart data
-  const stockData = {
-    labels: products.map((p) => p.name),
-    datasets: [
-      {
-        label: "Stock Levels",
-        data: products.map((p) => p.stock),
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#9966FF",
-          "#6699FF",
-        ],
-        hoverOffset: 4,
-      },
-    ],
-  };
-
-  // Low stock reminders
-  const lowStockReminders = products.filter((p) => p.stock < 30);
+  const lowStockProducts = products.filter((product) => product.stock <= 30);
 
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar collapsed={sidebarCollapsed} />
       <div className="flex-1 flex flex-col">
-        <TitleHeader toggleSidebar={handleCollapse} title="Categories page" />
-
-        {/* Content Area */}
-        <div className="p-4 overflow-y-auto flex-1">
-          {/* Add New Product Button */}
-          <div className="mb-4">
-            <button
-              onClick={() => setIsAddingNew(true)}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-purple-700 transition-colors"
-            >
-              Add New Product
-            </button>
-          </div>
-
-          {/* New Product Form */}
-          {isAddingNew && (
-            <div className="mb-4 bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-2">Add New Product</h3>
-              <form
-                onSubmit={handleAddNewProduct}
-                className="flex flex-col md:flex-row md:space-x-4"
-              >
-                <input
-                  type="text"
-                  placeholder="Product Name"
-                  value={newProduct.name}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setNewProduct({ ...newProduct, name: e.target.value })
-                  }
-                  className="border p-2 rounded mb-2 md:mb-0 flex-1"
-                />
-                <input
-                  type="text"
-                  placeholder="Category"
-                  value={newProduct.category}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setNewProduct({ ...newProduct, category: e.target.value })
-                  }
-                  className="border p-2 rounded mb-2 md:mb-0 flex-1"
-                />
-                <input
-                  type="number"
-                  placeholder="Stock (%)"
-                  value={newProduct.stock}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setNewProduct({ ...newProduct, stock: e.target.value })
-                  }
-                  className="border p-2 rounded mb-2 md:mb-0 flex-1"
-                />
+        <TitleHeader toggleSidebar={handleCollapse} title="Categories Page" />
+        <div className="p-4 overflow-y-auto flex-1 flex gap-6">
+          {/* Product cards */}
+          <div className="flex-1">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              {products.map((p, index) => (
                 <button
-                  type="submit"
-                  className="bg-green-500 text-white px-4 py-2 rounded mr-2 hover:bg-green-600"
+                  key={index}
+                  onClick={() => handleProductClick(p)}
+                  className="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow"
+                  aria-label={`View details for ${p.name}`}
                 >
-                  Create
+                  <img
+                    src={productImages[p.name]}
+                    alt={p.name}
+                    className="w-full h-auto object-cover rounded-lg mb-2"
+                  />
+                  <h3 className="text-lg font-semibold">{p.name}</h3>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setIsAddingNew(false)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-              </form>
+              ))}
             </div>
-          )}
-
-          {/* Edit Form */}
-          {editingProduct && editedProduct && (
-            <div className="mb-4 bg-white p-4 rounded-lg shadow">
-              <h3 className="text-lg font-semibold mb-2">
-                Edit Product: {editingProduct.name}
-              </h3>
-              <form
-                onSubmit={handleSaveEdit}
-                className="flex flex-col md:flex-row md:space-x-4"
-              >
-                <input
-                  type="text"
-                  placeholder="Product Name"
-                  value={editedProduct.name}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setEditedProduct({ ...editedProduct, name: e.target.value })
-                  }
-                  className="border p-2 rounded mb-2 md:mb-0 flex-1"
-                />
-                <input
-                  type="text"
-                  placeholder="Category"
-                  value={editedProduct.category}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setEditedProduct({
-                      ...editedProduct,
-                      category: e.target.value,
-                    })
-                  }
-                  className="border p-2 rounded mb-2 md:mb-0 flex-1"
-                />
-                <input
-                  type="number"
-                  placeholder="Stock (%)"
-                  value={editedProduct.stock}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setEditedProduct({
-                      ...editedProduct,
-                      stock: parseInt(e.target.value, 10) || 0,
-                    })
-                  }
-                  className="border p-2 rounded mb-2 md:mb-0 flex-1"
-                />
-                <button
-                  type="submit"
-                  className="bg-green-500 text-white px-4 py-2 rounded mr-2 hover:bg-green-600"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancelEdit}
-                  className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Search & Filter */}
-          <div className="flex flex-col md:flex-row md:space-x-4 mb-4">
-            {/* Search */}
-            <input
-              type="text"
-              placeholder="Search product..."
-              className="border p-2 rounded mb-2 md:mb-0 flex-1"
-              value={searchTerm}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setSearchTerm(e.target.value)
-              }
-            />
-
-            {/* Category Filter */}
-            <select
-              className="border p-2 rounded flex-1"
-              value={categoryFilter}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                setCategoryFilter(e.target.value)
-              }
-            >
-              <option value="All">All Categories</option>
-              <option value="Fruits">Fruits</option>
-              <option value="Vegetables">Vegetables</option>
-            </select>
           </div>
 
-          {/* Product Table */}
-          <div className="overflow-x-auto mb-4">
-            <table className="min-w-full bg-white border border-gray-300 rounded">
-              <thead>
-                <tr>
-                  <th className="border-b p-2 text-left">Product Name</th>
-                  <th className="border-b p-2 text-left">Category</th>
-                  <th className="border-b p-2 text-left">Stock Level</th>
-                  <th className="border-b p-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((p, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="border-b p-2">{p.name}</td>
-                      <td className="border-b p-2">{p.category}</td>
-                      <td className="border-b p-2">{p.stock}%</td>
-                      <td className="border-b p-2">
-                        <button
-                          onClick={() => handleEdit(p)}
-                          className="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.name)}
-                          className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="p-2 text-center">
-                      No products found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Charts & Reminders */}
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Pie Chart */}
-            <div className="bg-white p-4 rounded shadow flex-1 md:w-1/2">
-              <h3 className="text-lg font-semibold mb-2">
-                Stock Distribution
+          {/* Right sidebar */}
+          <div className="w-80 space-y-6">
+            {/* Pie chart */}
+            <div className="bg-white rounded-lg shadow-md p-4">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">
+                Product Stock Levels
               </h3>
-              <div className="w-full h-80">
-                <Pie data={stockData} />
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) =>
+                        `${name} ${(percent * 100).toFixed(0)}%`
+                      }
+                      outerRadius={80}
+                      dataKey="value"
+                    >
+                      {pieChartData.map((_, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
-            {/* Low Stock Reminders */}
-            {lowStockReminders.length > 0 && (
-              <div className="bg-yellow-100 p-4 rounded shadow flex-1 md:w-1/2">
-                <h4 className="font-semibold mb-2">Reminders</h4>
-                <ul className="list-disc list-inside">
-                  {lowStockReminders.map((p, index) => (
-                    <li key={index}>
-                      {p.name} stock is low! ({p.stock}% units)
-                    </li>
+            {/* Low stock alerts */}
+            <div className="bg-white rounded-lg shadow-md p-4">
+              <div className="flex items-center mb-4">
+                <AlertTriangle className="text-red-500 mr-2" size={20} />
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Low Stock Alert
+                </h3>
+              </div>
+
+              {lowStockProducts.length > 0 ? (
+                <div className="space-y-3">
+                  {lowStockProducts.map((product, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-red-50 rounded-lg border-l-4 border-red-500"
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={productImages[product.name]}
+                          alt={product.name}
+                          className="w-10 h-10 rounded-lg mr-3"
+                        />
+                        <div>
+                          <p className="font-medium text-gray-800">{product.name}</p>
+                          <p className="text-sm text-gray-600">{product.category}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-red-600">{product.stock}%</p>
+                        <p className="text-xs text-gray-500">Shelf Level</p>
+                      </div>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            )}
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-gray-500">All products are well stocked!</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-80">
+            <img
+              src={productImages[selectedProduct.name]}
+              alt={selectedProduct.name}
+              className="w-full h-40 object-cover rounded-lg mb-4"
+            />
+            <h2 className="text-xl font-bold mb-2">{selectedProduct.name}</h2>
+            <p className="text-sm text-gray-600 mb-2">{selectedProduct.category}</p>
+            <p className="text-lg">
+              <strong>Stock Level:</strong>{" "}
+              <span className="text-purple-600">{selectedProduct.stock}%</span>
+            </p>
+            <button
+              onClick={handleCloseModal}
+              className="mt-6 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors w-full"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
