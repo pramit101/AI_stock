@@ -2,4 +2,127 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
 /* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
+
+/* Global CSS Custom Properties for Light/Dark Mode */
+:root {
+  /* Light Mode Colors */
+  --sidebar-bg: #0A2A4A;
+  --sidebar-hover: #012a5a;
+  --sidebar-active: #011f41;
+  --sidebar-border: #012a5a;
+  
+  --header-bg: #ffffff;
+  --header-border: #e5e7eb;
+  --header-text: #111827;
+  --header-hover: #f3f4f6;
+  
+  --main-bg: #f9fafb;
+  --main-text: #111827;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  
+  --input-bg: #f9fafb;
+  --input-border: #d1d5db;
+  --input-text: #374151;
+  --input-placeholder: #9ca3af;
+  
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  /* Dark Mode Colors */
+  --sidebar-bg: #0f172a;
+  --sidebar-hover: #1e293b;
+  --sidebar-active: #334155;
+  --sidebar-border: #1e293b;
+  
+  --header-bg: #111827;
+  --header-border: #374151;
+  --header-text: #f9fafb;
+  --header-hover: #1f2937;
+  
+  --main-bg: #111827;
+  --main-text: #f9fafb;
+  --card-bg: #1f2937;
+  --card-border: #374151;
+  
+  --input-bg: #1f2937;
+  --input-border: #4b5563;
+  --input-text: #d1d5db;
+  --input-placeholder: #6b7280;
+  
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Utility Classes */
+.sidebar {
+  background-color: var(--sidebar-bg);
+  border-color: var(--sidebar-border);
+}
+
+.sidebar-hover {
+  background-color: var(--sidebar-hover);
+}
+
+.sidebar-active {
+  background-color: var(--sidebar-active);
+}
+
+.header {
+  background-color: var(--header-bg);
+  border-color: var(--header-border);
+  color: var(--header-text);
+  box-shadow: var(--shadow);
+}
+
+.header-hover {
+  background-color: var(--header-hover);
+}
+
+.main {
+  background-color: var(--main-bg);
+  color: var(--main-text);
+}
+
+.card {
+  background-color: var(--card-bg);
+  border-color: var(--card-border);
+  box-shadow: var(--shadow);
+}
+
+.input {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--input-text);
+}
+
+.input::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Enhanced scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--main-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sidebar-hover);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sidebar-active);
+}
