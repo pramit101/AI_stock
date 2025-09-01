@@ -1,4 +1,5 @@
 // src/pages/Report.tsx
+
 import { useState } from "react";
 import {
   Package,
@@ -196,6 +197,3 @@ export default function Report() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
