@@ -1,18 +1,11 @@
-import { Sidebar } from "../components/Sidebar";
 import { useState, useCallback, useRef } from "react";
-import { TitleHeader } from "../components/TitleHeader";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Upload() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [UploadFiles, setUploadFiles] = useState<File[]>([]);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-
-  const handleCollapse = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
 
   const handleFiles = useCallback((files: FileList | File[]) => {
     const newFiles = Array.from(files);
@@ -58,9 +51,7 @@ export default function Upload() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar collapsed={sidebarCollapsed} />
       <div className="flex flex-col flex-1">
-        <TitleHeader toggleSidebar={handleCollapse} title="Upload page" />
         <main className="flex flex-col items-center justify-center p-3 h-full ">
           <h2 className="text-2xl font-semibold text-gray-700">
             Upload pictures or video of your produce here.
