@@ -1,17 +1,9 @@
-import { Sidebar } from "../components/Sidebar";
-import { useState } from "react";
-import { TitleHeader } from "../components/TitleHeader";
-
+// src/pages/Report.tsx
 export default function Report() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const handleCollapse = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
-
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar collapsed={sidebarCollapsed} />
-      <TitleHeader toggleSidebar={handleCollapse} title="Report page" />
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Report</h1>
+      {/* your report UI here */}
     </div>
   );
 }

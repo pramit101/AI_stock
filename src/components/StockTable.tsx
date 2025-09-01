@@ -1,222 +1,185 @@
-import React, { useState, useRef } from 'react';
-import { ChevronDownIcon, ChevronUpIcon, FilterIcon, EditIcon, TrashIcon, PlusIcon, CameraIcon, CheckCircleIcon, XCircleIcon } from 'lucide-react';
+import React, { useEffect, useRef, useState } from "react";
+import { CameraIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
+import { Link } from "react-router-dom";
+
 interface StockTableProps {
   onItemRestocked: (itemId: number) => void;
 }
-export function StockTable({
-  onItemRestocked
-}: StockTableProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState('name');
-  const [sortDirection, setSortDirection] = useState('asc');
+
+type StockItem = { id: number; name: string; percent: number };
+
+export function StockTable({ onItemRestocked }: StockTableProps) {
   const [uploadingForItem, setUploadingForItem] = useState<number | null>(null);
-  const [photoUploaded, setPhotoUploaded] = useState<{
-    [key: number]: boolean;
-  }>({});
+  const [photoUploaded, setPhotoUploaded] = useState<Record<number, boolean>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // Mock data for most stocked produce with max capacity
-  const [stockItems, setStockItems] = useState([{
-    id: 1,
-    name: 'Organic Bananas',
-    quantity: 145,
-    maxCapacity: 200
-  }, {
-    id: 2,
-    name: 'Gala Apples',
-    quantity: 87,
-    maxCapacity: 200
-  }, {
-    id: 3,
-    name: 'Fresh Strawberries',
-    quantity: 32,
-    maxCapacity: 100
-  }, {
-    id: 4,
-    name: 'Hass Avocados',
-    quantity: 53,
-    maxCapacity: 150
-  }, {
-    id: 5,
-    name: 'Organic Carrots',
-    quantity: 78,
-    maxCapacity: 150
-  }]);
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
-  };
-  const calculatePercentage = (quantity: number, maxCapacity: number) => {
-    return quantity / maxCapacity * 100;
-  };
-  const getPercentageColor = (percentage: number) => {
-    if (percentage < 30) return 'bg-red-500';
-    if (percentage < 60) return 'bg-yellow-500';
-    return 'bg-green-500';
-  };
+
+  const [stockItems, setStockItems] = useState<StockItem[]>([
+    { id: 1, name: "Apples", percent: 0 },
+    { id: 2, name: "Bananas", percent: 0 },
+    { id: 3, name: "Cucumbers", percent: 0 },
+    { id: 4, name: "Carrots", percent: 0 },
+    { id: 5, name: "Potatoes", percent: 0 },
+    { id: 6, name: "Tomatoes", percent: 0 },
+  ]);
+
+  const getPercentageColor = (p: number) =>
+    p < 30 ? "bg-red-500" : p < 60 ? "bg-yellow-500" : "bg-green-500";
+
   const initiateRestock = (id: number) => {
     setUploadingForItem(id);
-    // Trigger file input click
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    fileInputRef.current?.click();
   };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      // Simulate photo verification
-      setTimeout(() => {
-        if (uploadingForItem !== null) {
-          setPhotoUploaded(prev => ({
-            ...prev,
-            [uploadingForItem]: true
-          }));
-        }
-      }, 1000);
+    const files = e.target.files;
+    if (!files || files.length === 0) {
+      setUploadingForItem(null);
+      return;
     }
+    setTimeout(() => {
+      if (uploadingForItem !== null) {
+        setPhotoUploaded(prev => ({ ...prev, [uploadingForItem]: true }));
+      }
+    }, 800);
   };
+
+  useEffect(() => {
+    const onFocus = () => {
+      if (!fileInputRef.current) return;
+      if (
+        uploadingForItem !== null &&
+        (!fileInputRef.current.files || fileInputRef.current.files.length === 0) &&
+        !photoUploaded[uploadingForItem]
+      ) {
+        setUploadingForItem(null);
+      }
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [uploadingForItem, photoUploaded]);
+
   const completeRestock = (id: number) => {
-    setStockItems(items => items.map(item => item.id === id ? {
-      ...item,
-      quantity: item.maxCapacity
-    } : item));
-    setPhotoUploaded(prev => ({
-      ...prev,
-      [id]: false
-    }));
+    setStockItems(items => items.map(it => (it.id === id ? { ...it, percent: 100 } : it)));
+    setPhotoUploaded(prev => ({ ...prev, [id]: false }));
     setUploadingForItem(null);
-    onItemRestocked(id); // Notify parent component about restock
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    onItemRestocked(id);
   };
+
   const cancelRestock = (id: number) => {
-    setPhotoUploaded(prev => ({
-      ...prev,
-      [id]: false
-    }));
+    setPhotoUploaded(prev => ({ ...prev, [id]: false }));
     setUploadingForItem(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
-  const sortedItems = [...stockItems].sort((a, b) => {
-    if (sortField === 'stockPercentage') {
-      const percentA = calculatePercentage(a.quantity, a.maxCapacity);
-      const percentB = calculatePercentage(b.quantity, b.maxCapacity);
-      return sortDirection === 'asc' ? percentA - percentB : percentB - percentA;
-    } else {
-      return sortDirection === 'asc' ? String(a[sortField as keyof typeof a]).localeCompare(String(b[sortField as keyof typeof b])) : String(b[sortField as keyof typeof b]).localeCompare(String(a[sortField as keyof typeof a]));
-    }
-  });
-  return <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center p-3 border-b">
-        <h2 className="text-lg font-medium">Most Stocked Produce</h2>
-        <div className="flex items-center space-x-2">
-          <button className="flex items-center px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200">
-            <FilterIcon size={16} className="mr-2" />
-            Filter
-          </button>
-          <button className="flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
-            <PlusIcon size={16} className="mr-2" />
-            Add Item
-          </button>
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex justify-between items-center p-4 border-b border-opacity-20 border-gray-300 dark:border-gray-600">
+        <h2 className="text-lg font-semibold">Most Stocked Produce</h2>
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          Showing <span className="font-medium">{stockItems.length}</span> items
         </div>
       </div>
-      {/* Hidden file input for photo upload */}
-      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" capture="environment" onChange={handleFileChange} />
-      <div className="overflow-y-auto flex-1">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileChange}
+      />
+
+      <div className="flex-1 overflow-hidden">
+        <table className="min-w-full divide-y divide-opacity-20 divide-gray-300 dark:divide-gray-600">
+          <thead className="bg-opacity-50 bg-gray-100 dark:bg-gray-800">
             <tr>
-              <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('name')}>
-                <div className="flex items-center">
-                  Product Name
-                  {sortField === 'name' && (sortDirection === 'asc' ? <ChevronUpIcon size={16} className="ml-1" /> : <ChevronDownIcon size={16} className="ml-1" />)}
-                </div>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                Product
               </th>
-              <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('stockPercentage')}>
-                <div className="flex items-center">
-                  Stock Remaining
-                  {sortField === 'stockPercentage' && (sortDirection === 'asc' ? <ChevronUpIcon size={16} className="ml-1" /> : <ChevronDownIcon size={16} className="ml-1" />)}
-                </div>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                Stock Remaining
               </th>
-              <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {sortedItems.map(item => {
-            const stockPercentage = calculatePercentage(item.quantity, item.maxCapacity);
-            const isUploading = uploadingForItem === item.id;
-            const hasUploadedPhoto = photoUploaded[item.id];
-            return <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
+
+          <tbody className="card divide-y divide-opacity-20 divide-gray-300 dark:divide-gray-600">
+            {stockItems.map(item => {
+              const isUploading = uploadingForItem === item.id;
+              const hasUploadedPhoto = !!photoUploaded[item.id];
+
+              return (
+                <tr key={item.id} className="hover:bg-opacity-50 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <Link 
+                      to={`/inventory/${item.name.toLowerCase()}`}
+                      className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 cursor-pointer"
+                    >
                       {item.name}
-                    </div>
+                    </Link>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+
+                  <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="text-sm mr-3 font-medium">
-                        {stockPercentage.toFixed(0)}%
-                      </div>
-                      <div className="w-24 bg-gray-200 rounded-full h-2.5">
-                        <div className={`h-2.5 rounded-full ${getPercentageColor(stockPercentage)}`} style={{
-                      width: `${stockPercentage}%`
-                    }}></div>
+                      <div className="text-sm mr-4 font-semibold">{item.percent}%</div>
+                      <div className="w-28 bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                        <div
+                          className={`h-3 rounded-full transition-all duration-300 ${getPercentageColor(item.percent)}`}
+                          style={{ width: `${item.percent}%` }}
+                        />
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      {!isUploading && !hasUploadedPhoto && <button onClick={() => initiateRestock(item.id)} className="flex items-center px-2 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700" title="Take a photo to verify restock">
-                          <CameraIcon size={14} className="mr-1" />
+
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-3">
+                      {!isUploading && !hasUploadedPhoto && (
+                        <button
+                          onClick={() => initiateRestock(item.id)}
+                          className="flex items-center px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-sm"
+                          title="Take a photo to verify restock"
+                        >
+                          <CameraIcon size={16} className="mr-2" />
                           Verify
-                        </button>}
-                      {isUploading && !hasUploadedPhoto && <div className="flex items-center px-2 py-1 text-sm bg-gray-100 rounded">
-                          <span className="animate-pulse">Uploading...</span>
-                        </div>}
-                      {hasUploadedPhoto && <>
-                          <button onClick={() => completeRestock(item.id)} className="flex items-center px-2 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700">
-                            <CheckCircleIcon size={14} className="mr-1" />
+                        </button>
+                      )}
+
+                      {isUploading && !hasUploadedPhoto && (
+                        <div className="flex items-center px-3 py-2 text-sm input rounded-lg">
+                          <span className="animate-pulse text-gray-700 dark:text-gray-300">Uploading...</span>
+                        </div>
+                      )}
+
+                      {hasUploadedPhoto && (
+                        <>
+                          <button
+                            onClick={() => completeRestock(item.id)}
+                            className="flex items-center px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 shadow-sm"
+                          >
+                            <CheckCircleIcon size={16} className="mr-2" />
                             Confirm
                           </button>
-                          <button onClick={() => cancelRestock(item.id)} className="flex items-center px-2 py-1 text-sm bg-red-100 text-red-600 rounded hover:bg-red-200">
-                            <XCircleIcon size={14} />
+                          <button
+                            onClick={() => cancelRestock(item.id)}
+                            className="flex items-center px-3 py-2 text-sm bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors duration-200"
+                            title="Cancel"
+                          >
+                            <XCircleIcon size={16} />
                           </button>
-                        </>}
-                      <button className="text-blue-600 hover:text-blue-900">
-                        <EditIcon size={16} />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <TrashIcon size={16} />
-                      </button>
+                        </>
+                      )}
                     </div>
                   </td>
-                </tr>;
-          })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      <div className="px-3 py-2 flex items-center justify-between border-t border-gray-200 mt-auto">
-        <div className="hidden sm:block">
-          <p className="text-xs text-gray-700">
-            Showing <span className="font-medium">5</span> results
-          </p>
-        </div>
-        <div>
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-            <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} className="relative inline-flex items-center px-2 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-              <span className="sr-only">Previous</span>
-              <ChevronUpIcon className="h-4 w-4 rotate-90" />
-            </button>
-            <button className="relative inline-flex items-center px-3 py-1 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-              1
-            </button>
-            <button onClick={() => setCurrentPage(currentPage + 1)} className="relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-              <span className="sr-only">Next</span>
-              <ChevronDownIcon className="h-4 w-4 -rotate-90" />
-            </button>
-          </nav>
-        </div>
-      </div>
-    </div>;
+    </div>
+  );
 }
