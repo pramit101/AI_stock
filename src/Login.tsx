@@ -30,8 +30,7 @@ export function Login() {
       }
       navigate("/"); // redirect to dashboard
     } catch (err: any) {
-      // Show a generic error message to avoid XSS
-      setError("Invalid email or password.");
+      setError("Invalid email or password."); // safe generic error
     }
   };
 
@@ -47,9 +46,8 @@ export function Login() {
         "If an account with that email exists, a reset email has been sent."
       );
       setError("");
-      setForgotPasswordMode(false); // optionally exit forgot mode
+      setForgotPasswordMode(false);
     } catch {
-      // Avoid exposing details; same generic message
       setMessage(
         "If an account with that email exists, a reset email has been sent."
       );
@@ -64,7 +62,7 @@ export function Login() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-white font-sans">
+    <div className="flex h-screen items-center justify-center bg-gray-100 font-sans">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
           {forgotPasswordMode
@@ -74,7 +72,7 @@ export function Login() {
             : "Login"}
         </h1>
 
-        {/* Render messages safely as plain text */}
+        {/* Safe error and message display */}
         {error && (
           <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
         )}
