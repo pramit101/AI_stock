@@ -13,6 +13,7 @@ import { Cucumbers } from "./pages/Cucumbers";
 import { Carrots } from "./pages/Carrots";
 import { Potatoes } from "./pages/Potatoes";
 import { Tomatoes } from "./pages/Tomatoes";
+import {Login} from "./Login";
 
 export function AppRouter() {
   return (
@@ -30,6 +31,7 @@ export function AppRouter() {
           <Route path="/inventory/tomatoes" element={<Tomatoes />} />
           <Route path="/report" element={<Report />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/login" element={<Login />}/>
         </Route>
       </Routes>
     </BrowserRouter>
