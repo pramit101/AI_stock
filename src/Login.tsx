@@ -66,10 +66,10 @@ export function Login() {
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
           {forgotPasswordMode
-            ? "Reset Password"
+            ? "Forgot Password"
             : isSignup
-            ? "Sign Up"
-            : "Login"}
+            ? "Pentavision"
+            : "Pentavision"}
         </h1>
 
         {/* Safe error and message display */}
@@ -120,7 +120,7 @@ export function Login() {
               onClick={handleForgotPassword}
               className="w-full bg-[#1e40af] text-white py-2 rounded-lg hover:bg-blue-800 transition"
             >
-              Reset Password
+              Reset
             </button>
           )}
         </form>
