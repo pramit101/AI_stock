@@ -1,11 +1,10 @@
 // src/pages/Report.tsx
+<<<<<<< HEAD
+=======
+
+>>>>>>> 832e9189ae2b325aaf4d890b7598361b1d38eae6
 import { useState } from "react";
-import {
-  Package,
-  FileText,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
+import { Package, FileText, TrendingUp, TrendingDown } from "lucide-react";
 
 // Define Product type
 interface Product {
@@ -16,9 +15,11 @@ interface Product {
 
 // Map product names to real images
 const productImages: { [key: string]: string } = {
-  Banana: "https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?w=600&auto=format&fit=crop&q=60",
+  Banana:
+    "https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?w=600&auto=format&fit=crop&q=60",
   Apple: "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce",
-  Cucumber: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=600&auto=format&fit=crop&q=60",
+  Cucumber:
+    "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=600&auto=format&fit=crop&q=60",
   Tomato: "https://plus.unsplash.com/premium_photo-1726138646616-ec9fb0277048",
   Carrot: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37",
   Potato: "https://images.unsplash.com/photo-1518977676601-b53f82aba655",

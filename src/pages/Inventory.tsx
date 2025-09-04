@@ -45,7 +45,14 @@ export default function Inventory() {
     value: product.stock,
   }));
 
-  const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300", "#8dd1e1", "#d084d0"];
+  const COLORS = [
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#ff7300",
+    "#8dd1e1",
+    "#d084d0",
+  ];
   const lowStockProducts = products.filter((product) => product.stock <= 30);
 
   return (
@@ -131,8 +138,12 @@ export default function Inventory() {
                         className="w-10 h-10 rounded-lg mr-3"
                       />
                       <div>
-                        <p className="font-medium text-gray-800">{product.name}</p>
-                        <p className="text-sm text-gray-600">{product.category}</p>
+                        <p className="font-medium text-gray-800">
+                          {product.name}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {product.category}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -161,7 +172,9 @@ export default function Inventory() {
               className="w-full h-40 object-cover rounded-lg mb-4"
             />
             <h2 className="text-xl font-bold mb-2">{selectedProduct.name}</h2>
-            <p className="text-sm text-gray-600 mb-2">{selectedProduct.category}</p>
+            <p className="text-sm text-gray-600 mb-2">
+              {selectedProduct.category}
+            </p>
             <p className="text-lg">
               <strong>Stock Level:</strong>{" "}
               <span className="text-purple-600">{selectedProduct.stock}%</span>
