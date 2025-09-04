@@ -1,8 +1,4 @@
 // src/pages/Report.tsx
-<<<<<<< HEAD
-=======
-
->>>>>>> 832e9189ae2b325aaf4d890b7598361b1d38eae6
 import { useState } from "react";
 import { Package, FileText, TrendingUp, TrendingDown } from "lucide-react";
 
