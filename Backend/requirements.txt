@@ -1,0 +1,18 @@
+# Core AI Models
+transformers>=4.51.3
+ultralytics>=8.3.0
+torch>=2.0.0
+torchvision>=0.15.0
+
+# API Framework
+fastapi>=0.100.0
+uvicorn>=0.20.0
+python-multipart>=0.0.6
+
+# Image Processing
+pillow>=9.0.0
+opencv-python>=4.6.0
+
+# Utilities
+numpy>=1.23.0
+python-dotenv>=0.19.0
