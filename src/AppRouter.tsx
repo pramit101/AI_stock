@@ -13,11 +13,16 @@ import { Cucumbers } from "./pages/Cucumbers";
 import { Carrots } from "./pages/Carrots";
 import { Potatoes } from "./pages/Potatoes";
 import { Tomatoes } from "./pages/Tomatoes";
+import { Login } from "./Login";
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Login page outside Shell */}
+        <Route path="/login" element={<Login />} />
+
+        {/* All other pages inside Shell layout */}
         <Route element={<Shell />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/upload" element={<Upload />} />
