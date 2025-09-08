@@ -127,27 +127,64 @@ export default function Report() {
 
   return (
     <div className="p-6">
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {products.map((p) => (
+      {/* Top row - 3 cards */}
+      <div className="grid grid-cols-3 gap-6 mb-6">
+        {products.slice(0, 3).map((p) => (
           <button
             key={p.name}
             onClick={() => handleReportClick(p.name)}
-            className="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow"
+            className="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow flex flex-col justify-between mx-auto"
+            style={{ width: '250px', height: '280px' }}
           >
-            <img
-              src={productImages[p.name]}
-              alt={p.name}
-              className="w-full h-auto object-cover rounded-lg mb-2"
-            />
-            <h3 className="text-lg font-semibold">{p.name}</h3>
-            <p className="text-sm text-gray-600">Stock: {p.stock}%</p>
+            <div className="flex-1 flex items-center justify-center">
+              <img
+                src={productImages[p.name]}
+                alt={p.name}
+                className="object-cover rounded-lg"
+                style={{ width: '150px', height: '150px' }}
+              />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">{p.name}</h3>
+              <p className="text-sm text-gray-600">Stock: {p.stock}%</p>
+            </div>
           </button>
         ))}
+      </div>
+
+      {/* Middle row - 3 cards */}
+      <div className="grid grid-cols-3 gap-6 mb-6">
+        {products.slice(3, 6).map((p) => (
+          <button
+            key={p.name}
+            onClick={() => handleReportClick(p.name)}
+            className="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow flex flex-col justify-between mx-auto"
+            style={{ width: '250px', height: '280px' }}
+          >
+            <div className="flex-1 flex items-center justify-center">
+              <img
+                src={productImages[p.name]}
+                alt={p.name}
+                className="object-cover rounded-lg"
+                style={{ width: '150px', height: '150px' }}
+              />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">{p.name}</h3>
+              <p className="text-sm text-gray-600">Stock: {p.stock}%</p>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* Bottom row - 1 card (Overview) */}
+      <div className="flex justify-center">
         <button
           onClick={() => handleReportClick("Overview")}
-          className="bg-gradient-to-br from-purple-500 to-blue-600 text-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow"
+          className="bg-gradient-to-br from-purple-500 to-blue-600 text-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow flex flex-col justify-center"
+          style={{ width: '250px', height: '280px' }}
         >
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-4">
             <FileText size={60} />
           </div>
           <h3 className="text-lg font-semibold">Overview</h3>
