@@ -153,7 +153,7 @@ export function StockCharts({
       color: dark ? "#e5e7eb" : "#111827",
       fontSize: 12,
     },
-    labelStyle: { color: dark ? "#28509fff" : "#111827", fontSize: 12 },
+    labelStyle: { color: dark ? "#e5e7eb" : "#111827", fontSize: 12 },
     itemStyle: { color: dark ? "#d1d5db" : "#374151", fontSize: 12 },
   };
 
