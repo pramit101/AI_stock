@@ -39,7 +39,17 @@ export default function Inventory() {
 
   const handleProductClick = (product: Product) => {
     // Navigate to the individual product page
-    const productRoute = product.name.toLowerCase() + 's'; // Add 's' to make plural
+    let productRoute = product.name.toLowerCase();
+    
+    // Handle special plural cases
+    if (product.name === 'Potato') {
+      productRoute = 'potatoes';
+    } else if (product.name === 'Tomato') {
+      productRoute = 'tomatoes';
+    } else {
+      productRoute += 's'; // Add 's' to make plural for other products
+    }
+    
     navigate(`/inventory/${productRoute}`);
   };
 
