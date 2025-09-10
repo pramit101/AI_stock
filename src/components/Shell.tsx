@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import {
   MenuIcon,
-  SearchIcon,
   BellIcon,
   UserIcon,
   LayoutDashboardIcon,
@@ -19,6 +18,19 @@ import { AnimatedThemeToggler } from "./magicui/animated-theme-toggler";
 const SIDEBAR_WIDTH_PX = 256; // open width
 const SIDEBAR_RAIL_WIDTH_PX = 72; // closed width (icons only)
 
+const percentagePlaceholder = {
+  Apples: 0,
+  Bananas: 0,
+  Cucumbers: 0,
+  Carrots: 0,
+  Potatoes: 0,
+  Tomatoes: 0,
+};
+
+const filterPlaceholder = Object.entries(percentagePlaceholder).filter(
+  ([n, p]) => p <= 20
+);
+
 /* ---------------- Header ---------------- */
 function Header({
   open,
@@ -30,6 +42,7 @@ function Header({
   onClose: () => void;
 }) {
   const offset = open ? SIDEBAR_WIDTH_PX : SIDEBAR_RAIL_WIDTH_PX;
+  const [opened, setOpened] = useState(false);
 
   return (
     <header
@@ -56,10 +69,22 @@ function Header({
           <button
             className="p-2 rounded-md header-hover relative"
             aria-label="Notifications"
+            onClick={() => setOpened(!opened)}
           >
             <BellIcon size={20} className="text-gray-800 dark:text-gray-200" />
             <span className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2" />
           </button>
+          {opened && (
+            <div className="absolute p-5 right-24 top-16 w-64 rounded-xl shadow-lg bg-white border border-gray-200 z-50">
+              <ul className="divide-y divide-gray-100">
+                {filterPlaceholder.map(([n, p]) => (
+                  <li key={n} className="p-3 hover:bg-gray-50">
+                    {n} are critically low at {p}%
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="flex items-center">
             <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
