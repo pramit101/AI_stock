@@ -2,14 +2,22 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import {
-  MenuIcon, SearchIcon, BellIcon, UserIcon,
-  LayoutDashboardIcon, ListIcon, UploadIcon,
-  BarChart3Icon, SettingsIcon, HelpCircleIcon, LogOutIcon,
+  MenuIcon,
+  SearchIcon,
+  BellIcon,
+  UserIcon,
+  LayoutDashboardIcon,
+  ListIcon,
+  UploadIcon,
+  BarChart3Icon,
+  SettingsIcon,
+  HelpCircleIcon,
+  LogOutIcon,
 } from "lucide-react";
 import { AnimatedThemeToggler } from "./magicui/animated-theme-toggler";
 
-const SIDEBAR_WIDTH_PX = 256;       // open width
-const SIDEBAR_RAIL_WIDTH_PX = 72;   // closed width (icons only)
+const SIDEBAR_WIDTH_PX = 256; // open width
+const SIDEBAR_RAIL_WIDTH_PX = 72; // closed width (icons only)
 
 /* ---------------- Header ---------------- */
 function Header({
@@ -38,30 +46,27 @@ function Header({
           >
             <MenuIcon size={20} className="text-gray-800 dark:text-gray-200" />
           </button>
-          <div className="ml-4">
-            <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-2">
-              <SearchIcon size={16} className="text-gray-500 dark:text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search inventory..."
-                className="ml-2 bg-transparent border-none focus:outline-none text-sm w-40 md:w-64 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-              />
-            </div>
-          </div>
+          <div className="ml-4"></div>
         </div>
 
         <div className="flex items-center space-x-2 md:space-x-4">
           {/* Theme Toggle */}
           <AnimatedThemeToggler />
 
-          <button className="p-2 rounded-md header-hover relative" aria-label="Notifications">
+          <button
+            className="p-2 rounded-md header-hover relative"
+            aria-label="Notifications"
+          >
             <BellIcon size={20} className="text-gray-800 dark:text-gray-200" />
             <span className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2" />
           </button>
 
           <div className="flex items-center">
             <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center">
-              <UserIcon size={16} className="text-gray-600 dark:text-gray-300" />
+              <UserIcon
+                size={16}
+                className="text-gray-600 dark:text-gray-300"
+              />
             </div>
           </div>
         </div>
@@ -117,9 +122,7 @@ function Sidebar({ open }: { open: boolean }) {
                 <Link
                   to={item.to}
                   className={`flex items-center px-3 py-2 rounded-md transition-colors
-                    ${active
-                      ? "sidebar-active"
-                      : "hover:sidebar-hover"}`}
+                    ${active ? "sidebar-active" : "hover:sidebar-hover"}`}
                   aria-current={active ? "page" : undefined}
                   title={open ? undefined : item.name}
                 >

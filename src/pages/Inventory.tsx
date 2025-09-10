@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { AlertTriangle } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 
 // Define Product type
 interface Product {
@@ -28,6 +29,8 @@ const productImages: { [key: string]: string } = {
 
 export default function Inventory() {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [products] = useState<Product[]>([
     { name: "Banana", category: "Fruits", stock: 65 },
     { name: "Apple", category: "Fruits", stock: 75 },
@@ -39,7 +42,7 @@ export default function Inventory() {
 
   const handleProductClick = (product: Product) => {
     // Navigate to the individual product page
-    const productRoute = product.name.toLowerCase() + 's'; // Add 's' to make plural
+    const productRoute = product.name.toLowerCase() + "s"; // Add 's' to make plural
     navigate(`/inventory/${productRoute}`);
   };
 
@@ -57,21 +60,34 @@ export default function Inventory() {
     "#d084d0",
   ];
   const lowStockProducts = products.filter((product) => product.stock <= 30);
+  const filteredList = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Inventory</h1>
+      <div className="flex mb-10 w-96 ml-7 items-center border border-gray-400 dark:border-gray-700 rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-2">
+        <SearchIcon size={16} className="text-gray-500 dark:text-gray-400" />
+        <input
+          type="text"
+          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchTerm}
+          placeholder="Search inventory..."
+          className="ml-2 bg-transparent border-none focus:outline-none text-sm w-40 md:w-64 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+        />
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Product cards */}
         <div className="flex-1">
           <div className="grid grid-cols-3 gap-6">
-            {products.map((p, index) => (
+            {filteredList.map((p, index) => (
               <button
                 key={index}
                 onClick={() => handleProductClick(p)}
                 className="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow flex flex-col justify-between mx-auto"
-                style={{ width: '200px', height: '230px' }}
+                style={{ width: "200px", height: "230px" }}
                 aria-label={`View details for ${p.name}`}
               >
                 <div className="flex-1 flex items-center justify-center">
@@ -79,7 +95,7 @@ export default function Inventory() {
                     src={productImages[p.name]}
                     alt={p.name}
                     className="object-cover rounded-lg"
-                    style={{ width: '125px', height: '125px' }}
+                    style={{ width: "125px", height: "125px" }}
                   />
                 </div>
                 <h3 className="text-lg font-semibold">{p.name}</h3>
@@ -168,7 +184,6 @@ export default function Inventory() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

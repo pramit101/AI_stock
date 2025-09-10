@@ -1,7 +1,13 @@
 // src/pages/Report.tsx
 
 import { useState } from "react";
-import { Package, FileText, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  Package,
+  FileText,
+  TrendingUp,
+  TrendingDown,
+  SearchIcon,
+} from "lucide-react";
 
 // Define Product type
 interface Product {
@@ -23,6 +29,7 @@ const productImages: { [key: string]: string } = {
 };
 
 export default function Report() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [products] = useState<Product[]>([
     { name: "Banana", category: "Fruits", stock: 65 },
     { name: "Apple", category: "Fruits", stock: 75 },
@@ -47,6 +54,10 @@ export default function Report() {
   const handleCloseModal = () => {
     setSelectedReport(null);
   };
+
+  const filteredList = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Generate single product report
   const generateProductReport = (product: Product) => {
@@ -127,21 +138,31 @@ export default function Report() {
 
   return (
     <div className="p-6">
+      <div className="flex mb-10 w-1/2 ml-14 items-center border border-gray-400 dark:border-gray-700 rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-2">
+        <SearchIcon size={16} className="text-gray-500 dark:text-gray-400" />
+        <input
+          type="text"
+          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchTerm}
+          placeholder="Search report..."
+          className="ml-2 bg-transparent border-none focus:outline-none text-sm w-40 md:w-64 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+        />
+      </div>
       {/* Top row - 3 cards */}
       <div className="grid grid-cols-3 gap-6 mb-6">
-        {products.slice(0, 3).map((p) => (
+        {filteredList.slice(0, 3).map((p) => (
           <button
             key={p.name}
             onClick={() => handleReportClick(p.name)}
             className="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow flex flex-col justify-between mx-auto"
-            style={{ width: '250px', height: '280px' }}
+            style={{ width: "250px", height: "280px" }}
           >
             <div className="flex-1 flex items-center justify-center">
               <img
                 src={productImages[p.name]}
                 alt={p.name}
                 className="object-cover rounded-lg"
-                style={{ width: '150px', height: '150px' }}
+                style={{ width: "150px", height: "150px" }}
               />
             </div>
             <div>
@@ -154,19 +175,19 @@ export default function Report() {
 
       {/* Middle row - 3 cards */}
       <div className="grid grid-cols-3 gap-6 mb-6">
-        {products.slice(3, 6).map((p) => (
+        {filteredList.slice(3, 6).map((p) => (
           <button
             key={p.name}
             onClick={() => handleReportClick(p.name)}
             className="bg-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow flex flex-col justify-between mx-auto"
-            style={{ width: '250px', height: '280px' }}
+            style={{ width: "250px", height: "280px" }}
           >
             <div className="flex-1 flex items-center justify-center">
               <img
                 src={productImages[p.name]}
                 alt={p.name}
                 className="object-cover rounded-lg"
-                style={{ width: '150px', height: '150px' }}
+                style={{ width: "150px", height: "150px" }}
               />
             </div>
             <div>
@@ -182,7 +203,7 @@ export default function Report() {
         <button
           onClick={() => handleReportClick("Overview")}
           className="bg-gradient-to-br from-purple-500 to-blue-600 text-white rounded-lg shadow-md p-4 text-center hover:shadow-lg transition-shadow flex flex-col justify-center"
-          style={{ width: '250px', height: '280px' }}
+          style={{ width: "250px", height: "280px" }}
         >
           <div className="flex justify-center mb-4">
             <FileText size={60} />
