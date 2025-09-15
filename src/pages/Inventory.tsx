@@ -60,6 +60,7 @@ export default function Inventory() {
     "#d084d0",
   ];
   const lowStockProducts = products.filter((product) => product.stock <= 30);
+  
   const filteredList = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
