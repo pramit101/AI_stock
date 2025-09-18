@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-// Your Firebase config (copy what you have)
+// Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyB1kSyLQUl4kZMqdI8QgrT0cfyfbMjr5G0",
   authDomain: "pentavision-9d7da.firebaseapp.com",
@@ -15,5 +16,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Authentication
+// Export Authentication
 export const auth = getAuth(app);
+
+// Export Firestore Database
+export const db = getFirestore(app);
