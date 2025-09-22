@@ -9,7 +9,7 @@ export function Dashboard() {
   const [restockedItems, setRestockedItems] = useState<number[]>([]);
 
   const handleItemRestocked = (itemId: number) => {
-    setRestockedItems(prev => [...prev, itemId]);
+    setRestockedItems((prev) => [...prev, itemId]);
   };
 
   return (
@@ -20,9 +20,16 @@ export function Dashboard() {
           <StockCharts />
         </div>
         <div className="card rounded-xl shadow-lg h-80 p-4">
-          <RestockReminder percents={{
-            Apples: 0, Bananas: 0, Cucumbers: 0, Carrots: 0, Potatoes: 0, Tomatoes: 0
-          }} />
+          <RestockReminder
+            percents={{
+              Apples: 0,
+              Bananas: 0,
+              Cucumbers: 0,
+              Carrots: 0,
+              Potatoes: 0,
+              Tomatoes: 0,
+            }}
+          />
         </div>
       </div>
 
