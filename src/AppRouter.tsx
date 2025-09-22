@@ -13,11 +13,17 @@ import { Cucumbers } from "./pages/Cucumbers";
 import { Carrots } from "./pages/Carrots";
 import { Potatoes } from "./pages/Potatoes";
 import { Tomatoes } from "./pages/Tomatoes";
+import { Login } from "./Login";
+import TestAnalysisPage from "./pages/TestAnalysisPage"; // import the new page
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Login page outside Shell */}
+        <Route path="/login" element={<Login />} />
+
+        {/* All other pages inside Shell layout */}
         <Route element={<Shell />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/upload" element={<Upload />} />
@@ -30,6 +36,9 @@ export function AppRouter() {
           <Route path="/inventory/tomatoes" element={<Tomatoes />} />
           <Route path="/report" element={<Report />} />
           <Route path="/settings" element={<Settings />} />
+
+          {/* New Test Analysis Page */}
+          <Route path="/test-analysis" element={<TestAnalysisPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

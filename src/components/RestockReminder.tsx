@@ -42,7 +42,10 @@ function usePolledPercents(endpoint?: string, intervalMs = 5000) {
     };
 
     fetchOnce();
-    timerRef.current = window.setInterval(fetchOnce, intervalMs) as unknown as number;
+    timerRef.current = window.setInterval(
+      fetchOnce,
+      intervalMs
+    ) as unknown as number;
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
       abortRef.current?.abort();
@@ -98,7 +101,10 @@ export function RestockReminder({
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow h-full flex flex-col text-gray-900 dark:text-gray-100">
       <div className="p-3 border-b border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/50 rounded-t-lg">
         <div className="flex items-center">
-          <AlertCircleIcon size={20} className="text-red-600 dark:text-red-400 mr-2" />
+          <AlertCircleIcon
+            size={20}
+            className="text-red-600 dark:text-red-400 mr-2"
+          />
           <h3 className="text-lg font-medium text-red-700 dark:text-red-300">
             Urgent Restock Required
           </h3>
@@ -108,12 +114,18 @@ export function RestockReminder({
 
       <div className="p-4 flex-1 flex flex-col justify-center">
         <div className="text-center mb-2">
-          <span className="text-xl font-bold text-gray-900 dark:text-gray-100">{lowest.name}</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
+            {lowest.name}
+          </span>
         </div>
 
         <div className="flex justify-between text-sm mb-1">
-          <span className="text-gray-700 dark:text-gray-300">Current Stock</span>
-          <span className="font-medium text-gray-900 dark:text-gray-100">{lowest.percent}%</span>
+          <span className="text-gray-700 dark:text-gray-300">
+            Current Stock
+          </span>
+          <span className="font-medium text-gray-900 dark:text-gray-100">
+            {lowest.percent}%
+          </span>
         </div>
 
         <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-4 mb-2">

@@ -30,6 +30,7 @@ const productImages: { [key: string]: string } = {
 };
 
 export default function Report() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [products] = useState<Product[]>([
     { name: "Banana", category: "Fruits", stock: 65, history: [60, 62, 64, 65] },
     { name: "Apple", category: "Fruits", stock: 75, history: [70, 72, 74, 75] },
