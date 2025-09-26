@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   updateProfile,
+  reload,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -63,8 +64,10 @@ export function Login() {
         });
 
         await updateProfile(user, {
-          displayName: `${firstName} ${lastName}`,
+          displayName: firstName,
         });
+
+        await reload(user);
 
         setMessage("Account created!");
 
@@ -89,7 +92,7 @@ export function Login() {
         setForgotPasswordMode(false);
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        navigate("/"); // dashboard
+        navigate("/Home"); // dashboard
       }
     } catch (err: any) {
       setError(err.message || "An error occurred.");
@@ -203,11 +206,7 @@ export function Login() {
                 disabled={loading}
                 className="w-full bg-[#1e40af] text-white py-2 rounded-lg hover:bg-blue-800 transition"
               >
-                {loading
-                  ? "Please wait..."
-                  : isSignup
-                  ? "Sign Up"
-                  : "Login"}
+                {loading ? "Please wait..." : isSignup ? "Sign Up" : "Login"}
               </button>
             </>
           )}
