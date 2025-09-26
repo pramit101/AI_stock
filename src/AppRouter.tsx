@@ -21,11 +21,11 @@ export function AppRouter() {
     <BrowserRouter>
       <Routes>
         {/* Login page outside Shell */}
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
 
         {/* All other pages inside Shell layout */}
         <Route element={<Shell />}>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/Home" element={<HomePage />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/inventory/apples" element={<Apples />} />
