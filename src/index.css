@@ -104,6 +104,13 @@
   color: var(--input-placeholder);
 }
 
+/* 🔑 Apply global font + size */
+body {
+  font-family: var(--app-font-family, sans-serif);
+  font-size: var(--app-font-size, 16px);
+}
+
+
 /* Smooth transitions for theme switching */
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
