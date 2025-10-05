@@ -104,6 +104,16 @@
   color: var(--input-placeholder);
 }
 
+/* Product Image Dark Mode Support */
+.product-image {
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.dark .product-image {
+  filter: brightness(0.85) contrast(1.1);
+  opacity: 0.95;
+}
+
 /* Smooth transitions for theme switching */
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
