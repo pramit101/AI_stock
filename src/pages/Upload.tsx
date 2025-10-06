@@ -1,6 +1,9 @@
 import { useState, useCallback, useRef } from "react";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { doc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { db, auth } from "../firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 // Allowed magic bytes for image types
 const allowedMagicBytes: Record<string, string[]> = {
@@ -47,6 +50,7 @@ export default function Upload() {
   const [UploadFiles, setUploadFiles] = useState<File[]>([]);
   const [notification, setNotification] = useState<null | string>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const [user] = useAuthState(auth);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<null | "success" | "error">(null);
@@ -68,6 +72,60 @@ export default function Upload() {
     }
 
     setUploadFiles((prev) => [...prev, ...newFiles]);
+  type ShelfResult = {
+    status: string;
+    message: string;
+    data: Record<string, number>;
+    processing_time: number;
+    total_items: number;
+    timestamp: string;
+  };
+
+  const [results, setResults] = useState<ShelfResult>({
+    status: "success",
+    message: "Shelf analysis completed successfully",
+    data: {
+      banana: 69,
+      apple: 255.0,
+      orange: 90.2,
+      milk: 15.8,
+    },
+    processing_time: 2.345,
+    total_items: 4,
+    timestamp: "2022-01-15T10:30:45.123456",
+  });
+
+  async function saveShelfResult(data: typeof results) {
+    const newEntry = {
+      id: generateId(),
+      data: data.data,
+      timestamp: data.timestamp,
+    };
+    // Reference to your document (Firestore will auto-create the collection & doc if needed)
+    if (!user) {
+      console.error("No user logged in");
+      return;
+    }
+    const docRef = doc(db, "users", user.uid);
+    function generateId() {
+      return Date.now() + "-" + Math.random().toString(36).substr(2, 9);
+    }
+
+    try {
+      // Append the new entry
+      await updateDoc(docRef, {
+        results: arrayUnion(newEntry),
+      });
+
+      console.log("Result appended successfully!");
+    } catch (err) {
+      console.error("Error saving to Firestore:", err);
+    }
+  }
+
+  const handleFiles = useCallback((files: FileList | File[]) => {
+    const newFiles = Array.from(files);
+    setUploadFiles((prevFiles) => [...prevFiles, ...newFiles]);
     setUploadStatus(null);
   }, []);
 
@@ -83,6 +141,7 @@ export default function Upload() {
 
     setIsUploading(true);
     setUploadStatus(null);
+    saveShelfResult(results);
 
     const formData = new FormData();
     UploadFiles.forEach((file) => formData.append("files", file));
