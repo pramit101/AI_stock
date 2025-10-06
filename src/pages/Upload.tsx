@@ -1,12 +1,54 @@
 import { useState, useCallback, useRef } from "react";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { doc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 
+// Allowed magic bytes for image types
+const allowedMagicBytes: Record<string, string[]> = {
+  jpg: ["ffd8ff"],
+  png: ["89504e47"],
+  heic: ["00000018", "66747970"],
+  webp: ["52494646"],
+};
+
+// Helper: read first bytes of file
+function getFileMagicBytes(file: File, length = 12): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const arr = new Uint8Array(e.target?.result as ArrayBuffer);
+      const hex = Array.from(arr)
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      resolve(hex);
+    };
+    reader.onerror = () => reject("Failed to read file");
+    reader.readAsArrayBuffer(file.slice(0, length));
+  });
+}
+
+// Validate file by magic bytes
+async function validateFileMagic(file: File) {
+  const magic = await getFileMagicBytes(file, 12);
+  return Object.values(allowedMagicBytes).some((bytesArray) =>
+    bytesArray.some((b) => magic.startsWith(b))
+  );
+}
+
+// Inline notification component
+const Notification = ({ message }: { message: string }) => {
+  return (
+    <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded shadow-lg z-50 animate-slide-in">
+      {message}
+    </div>
+  );
+};
+
 export default function Upload() {
   const [UploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [notification, setNotification] = useState<null | string>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [user] = useAuthState(auth);
   const [isDragging, setIsDragging] = useState(false);
@@ -24,7 +66,7 @@ export default function Upload() {
     timestamp: string;
   };
 
-  const [results, setResults] = useState<ShelfResult>({
+  const [results] = useState<ShelfResult>({
     status: "success",
     message: "Shelf analysis completed successfully",
     data: {
@@ -44,56 +86,68 @@ export default function Upload() {
       data: data.data,
       timestamp: data.timestamp,
     };
-    // Reference to your document (Firestore will auto-create the collection & doc if needed)
+
     if (!user) {
       console.error("No user logged in");
       return;
     }
+
     const docRef = doc(db, "users", user.uid);
+
     function generateId() {
       return Date.now() + "-" + Math.random().toString(36).substr(2, 9);
     }
 
     try {
-      // Append the new entry
       await updateDoc(docRef, {
         results: arrayUnion(newEntry),
       });
-
       console.log("Result appended successfully!");
     } catch (err) {
       console.error("Error saving to Firestore:", err);
     }
   }
 
-  const handleFiles = useCallback((files: FileList | File[]) => {
-    const newFiles = Array.from(files);
-    setUploadFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  // Handle file selection with magic byte validation
+  const handleFiles = useCallback(async (files: FileList | File[]) => {
+    const validFiles: File[] = [];
+    for (const file of Array.from(files)) {
+      const isValid = await validateFileMagic(file);
+      if (isValid) {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length < files.length) {
+      setNotification(
+        "Some files were rejected. Only JPG, PNG, HEIC, WEBP are accepted."
+      );
+      setTimeout(() => setNotification(null), 5000);
+    }
+
+    setUploadFiles((prev) => [...prev, ...validFiles]);
     setUploadStatus(null);
   }, []);
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files) {
-        const filesArray = Array.from(e.target.files);
-        handleFiles(filesArray);
-      }
+      if (e.target.files) handleFiles(e.target.files);
     },
     [handleFiles]
   );
 
   const handleUpload = useCallback(() => {
+    if (UploadFiles.length === 0) return;
     setIsUploading(true);
     setUploadStatus(null);
     saveShelfResult(results);
 
-    // Simulate an API call
     setTimeout(() => {
       setIsUploading(false);
       setUploadStatus("success");
       setUploadFiles([]);
     }, 3000);
-  }, []);
+  }, [UploadFiles, results]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -112,16 +166,13 @@ export default function Upload() {
       e.preventDefault();
       e.stopPropagation();
       setIsDragging(false);
-      const files = e.dataTransfer.files;
-      handleFiles(files);
+      handleFiles(e.dataTransfer.files);
     },
     [handleFiles]
   );
 
   const handleRemoveFile = useCallback((fileToRemove: File) => {
-    setUploadFiles((prevFiles) =>
-      prevFiles.filter((file) => file !== fileToRemove)
-    );
+    setUploadFiles((prev) => prev.filter((file) => file !== fileToRemove));
   }, []);
 
   const FilePreview = ({ file }: { file: File }) => {
@@ -146,23 +197,7 @@ export default function Upload() {
     } else {
       previewContent = (
         <div className="w-full h-40 flex items-center justify-center bg-slate-950 rounded-t-lg text-center text-slate-500">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-file-x"
-          >
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-            <path d="m14 2-.5 5.5h5.5" />
-            <path d="m10 10 4 4" />
-            <path d="m14 10-4 4" />
-          </svg>
+          Unsupported file
         </div>
       );
     }
@@ -185,24 +220,7 @@ export default function Upload() {
             onClick={() => handleRemoveFile(file)}
             className="remove-file-btn p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition-colors duration-200"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-trash-2"
-            >
-              <path d="M3 6h18" />
-              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-              <line x1="10" x2="10" y1="11" y2="17" />
-              <line x1="14" x2="14" y1="11" y2="17" />
-            </svg>
+            Remove
           </button>
         </div>
       </div>
@@ -212,18 +230,20 @@ export default function Upload() {
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex flex-col flex-1">
+        {notification && <Notification message={notification} />}
         <main className="flex flex-col items-center justify-center p-3 h-full ">
           <h2 className="text-2xl font-semibold text-gray-700">
-            Upload pictures or video of your produce here.
+            Upload pictures or videos of your produce here.
           </h2>
+
           <div
-            onClick={() => fileRef.current && fileRef.current.click()}
+            onClick={() => fileRef.current?.click()}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`border-2 border-dashed ${
               isDragging ? "border-purple-500 bg-slate-300" : "border-gray-300"
-            } rounded-lg p-6 mt-6 flex flex-col items-center justify-between w-full  max-w-4xl h-96 cursor-pointer`}
+            } rounded-lg p-6 mt-6 flex flex-col items-center justify-between w-full max-w-4xl h-96 cursor-pointer`}
           >
             <div className="flex-1 flex items-center justify-center">
               <input
@@ -231,14 +251,14 @@ export default function Upload() {
                 className="mt-4 hidden"
                 ref={fileRef}
                 multiple
-                accept="image/*,video/*"
+                accept=".jpg,.jpeg,.png,.heic,.webp,video/*"
                 onChange={handleInputChange}
               />
-
               <button className="mt-4 px-4 py-2 bg-gray-300 text-white text-5xl rounded hover:bg-blue-700">
                 <FontAwesomeIcon icon={faUpload} />
               </button>
             </div>
+
             <div className="flex justify-center">
               <button
                 onClick={(e) => {
@@ -246,49 +266,23 @@ export default function Upload() {
                   handleUpload();
                 }}
                 disabled={UploadFiles.length === 0 || isUploading}
-                className={`w-full sm:w-auto px-8 py-4 transition-colors duration-300 text-white font-bold rounded-xl shadow-lg flex items-center justify-center space-x-2 
-                            ${
-                              UploadFiles.length === 0 || isUploading
-                                ? "bg-gray-500 shadow-none"
-                                : "bg-violet-600 hover:bg-violet-700 shadow-violet-500/30"
-                            }
-                            ${
-                              uploadStatus === "success"
-                                ? "bg-green-600 hover:bg-green-700 shadow-green-500/30"
-                                : ""
-                            }
-                        `}
+                className={`w-full sm:w-auto px-8 py-4 transition-colors duration-300 text-white font-bold rounded-xl shadow-lg flex items-center justify-center space-x-2 ${
+                  UploadFiles.length === 0 || isUploading
+                    ? "bg-gray-500 shadow-none"
+                    : "bg-violet-600 hover:bg-violet-700 shadow-violet-500/30"
+                } ${
+                  uploadStatus === "success"
+                    ? "bg-green-600 hover:bg-green-700 shadow-green-500/30"
+                    : ""
+                }`}
               >
-                <span id="button-text">
+                <span>
                   {isUploading
                     ? "Uploading..."
                     : uploadStatus === "success"
                     ? "Upload Successful!"
                     : `Upload ${UploadFiles.length} File(s)`}
                 </span>
-                <svg
-                  id="spinner"
-                  className={`animate-spin h-5 w-5 text-white ${
-                    isUploading ? "" : "hidden"
-                  }`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
               </button>
             </div>
           </div>

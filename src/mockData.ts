@@ -3,10 +3,10 @@ export const mockResult = {
   status: "success",
   message: "Shelf analysis completed successfully",
   data: {
-    banana: 50.5,
-    apple: 49.0,
-    orange: 34.2,
-    milk: 2.8
+    banana: 70.0,
+    apple: 59.0,
+    orange: 44.0,
+    milk: 30.0
   },
   processing_time: 2.345,
   total_items: 4,
