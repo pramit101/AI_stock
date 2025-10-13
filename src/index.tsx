@@ -1,4 +1,12 @@
 import "./index.css";
 import { render } from "react-dom";
 import { AppRouter } from "./AppRouter";
-render(<AppRouter />, document.getElementById("root"));
+import { SettingsProvider } from "./context/SettingsContext";
+import "./lib/i18n";
+
+render(
+  <SettingsProvider>
+    <AppRouter />
+  </SettingsProvider>,
+  document.getElementById("root")
+);

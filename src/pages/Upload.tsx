@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useTranslation } from "react-i18next";
 
 // Allowed magic bytes for image types
 const allowedMagicBytes: Record<string, string[]> = {
@@ -53,6 +54,7 @@ export default function Upload() {
   const [user] = useAuthState(auth);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const { t } = useTranslation();
   const [uploadStatus, setUploadStatus] = useState<null | "success" | "error">(
     null
   );
@@ -233,7 +235,7 @@ export default function Upload() {
         {notification && <Notification message={notification} />}
         <main className="flex flex-col items-center justify-center p-3 h-full ">
           <h2 className="text-2xl font-semibold text-gray-700">
-            Upload pictures or videos of your produce here.
+            {t("uploadProducePrompt")}
           </h2>
 
           <div

@@ -14,7 +14,6 @@ import { Carrots } from "./pages/Carrots";
 import { Potatoes } from "./pages/Potatoes";
 import { Tomatoes } from "./pages/Tomatoes";
 import { Login } from "./Login";
-import TestAnalysisPage from "./pages/TestAnalysisPage"; // import the new page
 
 export function AppRouter() {
   return (
@@ -36,9 +35,6 @@ export function AppRouter() {
           <Route path="/inventory/tomatoes" element={<Tomatoes />} />
           <Route path="/report" element={<Report />} />
           <Route path="/settings" element={<Settings />} />
-
-          {/* New Test Analysis Page */}
-          <Route path="/test-analysis" element={<TestAnalysisPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
