@@ -4,6 +4,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
+import { useTranslation } from "react-i18next";
 import {
   MenuIcon,
   BellIcon,
@@ -46,6 +47,7 @@ function Header({
   const offset = open ? SIDEBAR_WIDTH_PX : SIDEBAR_RAIL_WIDTH_PX;
   const [opened, setOpened] = useState(false);
   const [user, setUser] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -80,7 +82,7 @@ function Header({
 
         <div>
           <span className="text-gray-800 dark:text-gray-200 font-medium">
-            {`Welcome, ${user}`}
+            {`${t("welcome")}, ${user}`}
           </span>
         </div>
 
@@ -115,12 +117,21 @@ function Header({
 
 /* ---------------- Sidebar (rail when collapsed) ---------------- */
 function Sidebar({ open }: { open: boolean }) {
+  const { t } = useTranslation();
   const navItems = [
-    { name: "Dashboard", to: "/Home", icon: <LayoutDashboardIcon size={20} /> },
-    { name: "Inventory", to: "/inventory", icon: <ListIcon size={20} /> },
-    { name: "Upload", to: "/upload", icon: <UploadIcon size={20} /> },
-    { name: "Report", to: "/report", icon: <BarChart3Icon size={20} /> },
-    { name: "Settings", to: "/settings", icon: <SettingsIcon size={20} /> },
+    {
+      name: t("dashboard"),
+      to: "/Home",
+      icon: <LayoutDashboardIcon size={20} />,
+    },
+    {
+      name: t("inventory"),
+      to: "/inventory",
+      icon: <ListIcon size={20} />,
+    },
+    { name: t("upload"), to: "/upload", icon: <UploadIcon size={20} /> },
+    { name: t("report"), to: "/report", icon: <BarChart3Icon size={20} /> },
+    { name: t("settings"), to: "/settings", icon: <SettingsIcon size={20} /> },
   ];
 
   const location = useLocation();
@@ -202,7 +213,7 @@ function Sidebar({ open }: { open: boolean }) {
               open ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
           >
-            Help
+            {t("help")}
           </span>
         </button>
         <button
@@ -217,7 +228,7 @@ function Sidebar({ open }: { open: boolean }) {
               open ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
           >
-            Logout
+            {t("logout")}
           </span>
         </button>
       </div>

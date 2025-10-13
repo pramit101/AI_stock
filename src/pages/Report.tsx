@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { FileText } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { useTranslation } from "react-i18next";
 import {
   LineChart,
   Line,
@@ -21,9 +22,11 @@ interface Product {
 }
 
 const productImages: { [key: string]: string } = {
-  Banana: "https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?w=600&auto=format&fit=crop&q=60",
+  Banana:
+    "https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?w=600&auto=format&fit=crop&q=60",
   Apple: "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce",
-  Cucumber: "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=600&auto=format&fit=crop&q=60",
+  Cucumber:
+    "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=600&auto=format&fit=crop&q=60",
   Tomato: "https://plus.unsplash.com/premium_photo-1726138646616-ec9fb0277048",
   Carrot: "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37",
   Potato: "https://images.unsplash.com/photo-1518977676601-b53f82aba655",
@@ -31,20 +34,50 @@ const productImages: { [key: string]: string } = {
 
 export default function Report() {
   const [products] = useState<Product[]>([
-    { name: "Banana", category: "Fruits", stock: 65, history: [60, 62, 64, 65] },
+    {
+      name: "Banana",
+      category: "Fruits",
+      stock: 65,
+      history: [60, 62, 64, 65],
+    },
     { name: "Apple", category: "Fruits", stock: 75, history: [70, 72, 74, 75] },
-    { name: "Cucumber", category: "Vegetables", stock: 40, history: [42, 41, 40, 40] },
-    { name: "Tomato", category: "Vegetables", stock: 55, history: [50, 53, 54, 55] },
-    { name: "Carrot", category: "Vegetables", stock: 20, history: [30, 25, 22, 20] },
-    { name: "Potato", category: "Vegetables", stock: 25, history: [28, 27, 26, 25] },
+    {
+      name: "Cucumber",
+      category: "Vegetables",
+      stock: 40,
+      history: [42, 41, 40, 40],
+    },
+    {
+      name: "Tomato",
+      category: "Vegetables",
+      stock: 55,
+      history: [50, 53, 54, 55],
+    },
+    {
+      name: "Carrot",
+      category: "Vegetables",
+      stock: 20,
+      history: [30, 25, 22, 20],
+    },
+    {
+      name: "Potato",
+      category: "Vegetables",
+      stock: 25,
+      history: [28, 27, 26, 25],
+    },
   ]);
 
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
-  const [timeframe, setTimeframe] = useState<"daily" | "weekly" | "monthly">("weekly");
+  const [timeframe, setTimeframe] = useState<"daily" | "weekly" | "monthly">(
+    "weekly"
+  );
   const reportRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   const totalProducts = products.length;
-  const averageStock = Math.round(products.reduce((sum, p) => sum + p.stock, 0) / totalProducts);
+  const averageStock = Math.round(
+    products.reduce((sum, p) => sum + p.stock, 0) / totalProducts
+  );
   const lowStockProducts = products.filter((p) => p.stock <= 30);
 
   const handleReportClick = (report: string) => setSelectedReport(report);
@@ -83,7 +116,10 @@ export default function Report() {
     reportElement.style.maxHeight = "none";
 
     // Capture canvas
-    const canvas = await html2canvas(reportElement, { scale: 2, backgroundColor: "#ffffff" } as any);
+    const canvas = await html2canvas(reportElement, {
+      scale: 2,
+      backgroundColor: "#ffffff",
+    } as any);
     const imgData = canvas.toDataURL("image/png");
 
     const pdf = new jsPDF("p", "mm", "a4");
@@ -115,15 +151,22 @@ export default function Report() {
   const exportToCSV = (product?: Product) => {
     let csvContent = "data:text/csv;charset=utf-8,";
     if (product) {
-      csvContent += `Name,Category,Stock%,History\n${product.name},${product.category},${product.stock},${product.history?.join("|") || ""}`;
+      csvContent += `Name,Category,Stock%,History\n${product.name},${
+        product.category
+      },${product.stock},${product.history?.join("|") || ""}`;
     } else {
       csvContent += "Name,Category,Stock%\n";
-      products.forEach((p) => (csvContent += `${p.name},${p.category},${p.stock}\n`));
+      products.forEach(
+        (p) => (csvContent += `${p.name},${p.category},${p.stock}\n`)
+      );
     }
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${product ? product.name : "overview"}-report.csv`);
+    link.setAttribute(
+      "download",
+      `${product ? product.name : "overview"}-report.csv`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -131,7 +174,9 @@ export default function Report() {
 
   const generateOverviewReport = () => (
     <div className="p-6 bg-gray-50 rounded-xl shadow-md space-y-6">
-      <h2 className="text-3xl font-bold text-center mb-4">Fresh Produce Overview</h2>
+      <h2 className="text-3xl font-bold text-center mb-4">
+        Fresh Produce Overview
+      </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-lg">
         <p>
@@ -156,10 +201,12 @@ export default function Report() {
             <div className="w-full sm:w-48 h-28">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={getHistoryByTimeframe(p.history).map((value, index) => ({
-                    day: index + 1,
-                    stock: value,
-                  }))}
+                  data={getHistoryByTimeframe(p.history).map(
+                    (value, index) => ({
+                      day: index + 1,
+                      stock: value,
+                    })
+                  )}
                   margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
                 >
                   <Line
@@ -171,11 +218,19 @@ export default function Report() {
                   />
                   <XAxis
                     dataKey="day"
-                    label={{ value: "Day", position: "insideBottom", offset: -5 }}
+                    label={{
+                      value: "Day",
+                      position: "insideBottom",
+                      offset: -5,
+                    }}
                   />
                   <YAxis
                     domain={[0, 100]}
-                    label={{ value: "Stock %", angle: -90, position: "insideLeft" }}
+                    label={{
+                      value: "Stock %",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
                   />
                   <Tooltip />
                 </LineChart>
@@ -196,12 +251,20 @@ export default function Report() {
 
       {/* Combined chart */}
       <div className="mt-6 bg-white p-4 rounded-lg shadow">
-        <h3 className="text-xl font-semibold mb-2">All Products Stock History</h3>
+        <h3 className="text-xl font-semibold mb-2">
+          All Products Stock History
+        </h3>
         <div className="w-full h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={Array.from(
-                { length: Math.max(...products.map((p) => getHistoryByTimeframe(p.history).length)) },
+                {
+                  length: Math.max(
+                    ...products.map(
+                      (p) => getHistoryByTimeframe(p.history).length
+                    )
+                  ),
+                },
                 (_, i) => {
                   const entry: any = { day: i + 1 };
                   products.forEach((p) => {
@@ -213,14 +276,21 @@ export default function Report() {
               )}
             >
               <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-              <XAxis dataKey="day" label={{ value: "Day", position: "insideBottom", offset: -5 }} />
+              <XAxis
+                dataKey="day"
+                label={{ value: "Day", position: "insideBottom", offset: -5 }}
+              />
               <YAxis
                 domain={[0, 100]}
                 label={{ value: "Stock %", angle: -90, position: "insideLeft" }}
               />
               <Tooltip
                 formatter={(value: number, name: string) => [`${value}%`, name]}
-                contentStyle={{ backgroundColor: "#f9f9f9", borderRadius: 8, borderColor: "#ddd" }}
+                contentStyle={{
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: 8,
+                  borderColor: "#ddd",
+                }}
               />
               <Legend verticalAlign="top" height={36} />
               {products.map((p, index) => (
@@ -228,7 +298,16 @@ export default function Report() {
                   key={p.name}
                   type="monotone"
                   dataKey={p.name}
-                  stroke={["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"][index % 6]}
+                  stroke={
+                    [
+                      "#4f46e5",
+                      "#10b981",
+                      "#f59e0b",
+                      "#ef4444",
+                      "#8b5cf6",
+                      "#ec4899",
+                    ][index % 6]
+                  }
                   strokeWidth={2}
                   dot={false}
                 />
@@ -251,11 +330,27 @@ export default function Report() {
       <p>Most Recent Stock: {product.stock}%</p>
       {product.history && (
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={product.history.map((value, index) => ({ day: index + 1, stock: value }))}>
-            <Line type="monotone" dataKey="stock" stroke="#8884d8" strokeWidth={2} />
+          <LineChart
+            data={product.history.map((value, index) => ({
+              day: index + 1,
+              stock: value,
+            }))}
+          >
+            <Line
+              type="monotone"
+              dataKey="stock"
+              stroke="#8884d8"
+              strokeWidth={2}
+            />
             <CartesianGrid stroke="#ccc" />
-            <XAxis dataKey="day" label={{ value: "Day", position: "insideBottom", offset: 0 }} />
-            <YAxis domain={[0, 100]} label={{ value: "Stock %", angle: -90, position: "insideLeft" }} />
+            <XAxis
+              dataKey="day"
+              label={{ value: "Day", position: "insideBottom", offset: 0 }}
+            />
+            <YAxis
+              domain={[0, 100]}
+              label={{ value: "Stock %", angle: -90, position: "insideLeft" }}
+            />
             <Tooltip />
           </LineChart>
         </ResponsiveContainer>
@@ -283,7 +378,7 @@ export default function Report() {
               alt={p.name}
               className="w-full h-auto object-cover rounded-lg mb-2"
             />
-            <h3 className="text-lg font-semibold">{p.name}</h3>
+            <h3 className="text-lg font-semibold">{t(p.name.toLowerCase())}</h3>
             <p className="text-sm text-gray-600">Stock: {p.stock}%</p>
           </button>
         ))}
@@ -309,12 +404,18 @@ export default function Report() {
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">
-                  {selectedReport === "Overview" ? "Fresh Produce Overview" : `${selectedReport} Report`}
+                  {selectedReport === "Overview"
+                    ? "Fresh Produce Overview"
+                    : `${selectedReport} Report`}
                 </h2>
                 <div className="flex items-center gap-4">
                   <select
                     value={timeframe}
-                    onChange={(e) => setTimeframe(e.target.value as "daily" | "weekly" | "monthly")}
+                    onChange={(e) =>
+                      setTimeframe(
+                        e.target.value as "daily" | "weekly" | "monthly"
+                      )
+                    }
                     className="border rounded px-2 py-1 text-sm"
                   >
                     <option value="daily">Daily</option>
@@ -337,7 +438,9 @@ export default function Report() {
               <div className="mt-6 flex justify-end gap-3 export-buttons">
                 <button
                   onClick={() =>
-                    selectedReport === "Overview" ? exportToPDF() : exportToPDF(selectedProduct!)
+                    selectedReport === "Overview"
+                      ? exportToPDF()
+                      : exportToPDF(selectedProduct!)
                   }
                   className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
                 >
@@ -345,7 +448,9 @@ export default function Report() {
                 </button>
                 <button
                   onClick={() =>
-                    selectedReport === "Overview" ? exportToCSV() : exportToCSV(selectedProduct!)
+                    selectedReport === "Overview"
+                      ? exportToCSV()
+                      : exportToCSV(selectedProduct!)
                   }
                   className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors"
                 >

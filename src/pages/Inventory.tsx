@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { AlertTriangle } from "lucide-react";
 import { SearchIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Define Product type
 interface Product {
@@ -19,30 +20,31 @@ const productImages: { [key: string]: string } = {
     "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=1024&q=80",
   Cucumber:
     "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=600&auto=format&fit=crop&q=60",
-  Tomato:
+  Tomatoe:
     "https://plus.unsplash.com/premium_photo-1726138646616-ec9fb0277048?w=600&auto=format&fit=crop&q=60",
   Carrot:
     "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=600&auto=format&fit=crop&q=60",
-  Potato:
+  Potatoe:
     "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=60",
 };
 
 export default function Inventory() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const { t } = useTranslation();
 
   const [products] = useState<Product[]>([
-    { name: "Banana", category: "Fruits", stock: 65 },
-    { name: "Apple", category: "Fruits", stock: 75 },
-    { name: "Cucumber", category: "Vegetables", stock: 40 },
-    { name: "Tomato", category: "Vegetables", stock: 55 },
-    { name: "Carrot", category: "Vegetables", stock: 20 },
-    { name: "Potato", category: "Vegetables", stock: 25 },
+    { name: "Bananas", category: "Fruits", stock: 65 },
+    { name: "Apples", category: "Fruits", stock: 75 },
+    { name: "Cucumbers", category: "Vegetables", stock: 40 },
+    { name: "Tomatoes", category: "Vegetables", stock: 55 },
+    { name: "Carrots", category: "Vegetables", stock: 20 },
+    { name: "Potatoes", category: "Vegetables", stock: 25 },
   ]);
 
   const handleProductClick = (product: Product) => {
     // Navigate to the individual product page
-    const productRoute = product.name.toLowerCase() + "s"; // Add 's' to make plural
+    const productRoute = product.name.toLowerCase(); // Add 's' to make plural
     navigate(`/inventory/${productRoute}`);
   };
 
@@ -60,14 +62,14 @@ export default function Inventory() {
     "#d084d0",
   ];
   const lowStockProducts = products.filter((product) => product.stock <= 30);
-  
+
   const filteredList = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Inventory</h1>
+      <h1 className="text-2xl font-bold mb-6">{t("inventory")}</h1>
       <div className="flex mb-10 w-96 ml-7 items-center border border-gray-400 dark:border-gray-700 rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-2">
         <SearchIcon size={16} className="text-gray-500 dark:text-gray-400" />
         <input
@@ -93,13 +95,15 @@ export default function Inventory() {
               >
                 <div className="flex-1 flex items-center justify-center">
                   <img
-                    src={productImages[p.name]}
+                    src={productImages[p.name.slice(0, -1)]}
                     alt={p.name}
                     className="object-cover rounded-lg"
                     style={{ width: "125px", height: "125px" }}
                   />
                 </div>
-                <h3 className="text-lg font-semibold">{p.name}</h3>
+                <h3 className="text-lg font-semibold">
+                  {t(p.name.toLowerCase())}
+                </h3>
               </button>
             ))}
           </div>
@@ -157,7 +161,7 @@ export default function Inventory() {
                   >
                     <div className="flex items-center">
                       <img
-                        src={productImages[product.name]}
+                        src={productImages[product.name.slice(0, -1)]}
                         alt={product.name}
                         className="w-10 h-10 rounded-lg mr-3"
                       />
