@@ -8,7 +8,7 @@ export default function Landing() {
   const { t } = useTranslation();
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ fontFamily: "'Space Grotesk', sans-serif", background: 'linear-gradient(to bottom right, #020617, #0c1e3d, #020617)' }}>
+    <div className="landing-page relative" style={{ fontFamily: "'Space Grotesk', sans-serif", background: 'linear-gradient(to bottom right, #020617, #0c1e3d, #020617)' }}>
       {/* Animated Background */}
       <RippleGrid
         enableRainbow={false}
@@ -34,7 +34,7 @@ export default function Landing() {
           </div>
           <button
             onClick={() => navigate('/login')}
-            className="px-6 py-2 text-white rounded-lg transition-all duration-300 hover:opacity-90"
+            className="px-6 py-2 text-white font-semibold rounded-lg transition-all duration-300 hover:opacity-90 shadow-lg"
             style={{ backgroundColor: '#054E78' }}
           >
 {t("login")}
@@ -47,10 +47,10 @@ export default function Landing() {
             <div className="text-center space-y-8">
               {/* Main Heading */}
               <div className="space-y-6">
-                <h2 className="text-6xl md:text-8xl font-black text-white leading-tight tracking-tight">
+                <h2 className="text-6xl md:text-8xl font-black text-white leading-tight tracking-tight drop-shadow-lg">
                   {t("pentavision")}
                 </h2>
-                <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+                <p className="text-xl md:text-2xl text-gray-100 max-w-4xl mx-auto leading-relaxed drop-shadow-md">
                   AI-Powered Inventory Management: Transforming the fresh produce shelf with AI technology to insights
                 </p>
               </div>
@@ -59,7 +59,7 @@ export default function Landing() {
               <div className="flex justify-center mt-12">
                 <button
                   onClick={() => navigate('/login')}
-                  className="group px-10 py-4 text-white text-lg font-semibold rounded-full hover:opacity-90 transform hover:scale-105 transition-all duration-300 flex items-center space-x-2 shadow-2xl"
+                  className="group px-10 py-4 text-white text-lg font-bold rounded-full hover:opacity-90 transform hover:scale-105 transition-all duration-300 flex items-center space-x-2 shadow-2xl border-2 border-white/20"
                   style={{ backgroundColor: '#054E78' }}
                 >
                   <span>Get Started</span>
@@ -71,8 +71,8 @@ export default function Landing() {
         </main>
 
         {/* Footer */}
-        <footer className="px-6 py-6 text-center text-gray-400 text-sm">
-          <p>&copy; 2025 PentaVision. AI Stock Level Detection System.</p>
+        <footer className="px-6 py-6 text-center text-gray-200 text-sm">
+          <p>PentaVision 2025 All rights are reserved</p>
         </footer>
       </div>
     </div>

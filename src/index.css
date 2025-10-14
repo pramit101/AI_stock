@@ -118,6 +118,29 @@
 body {
   font-family: var(--app-font-family, sans-serif);
   font-size: var(--app-font-size, 16px);
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+  min-height: 100vh;
+}
+
+html {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+/* Landing page specific styles */
+.landing-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* Smooth transitions for theme switching */
