@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { useTranslation } from "react-i18next";
 import { createRoot } from "react-dom/client";
+import { useSettings } from "../context/SettingsContext";
 
 interface Product {
   name: string;
@@ -34,6 +35,7 @@ const productImages: { [key: string]: string } = {
 
 export default function Report() {
   const { t } = useTranslation();
+  const { fontSize, fontStyle } = useSettings();
   
   // Get real data from Inventory page - but keep it blank (0%) since no uploads yet
   const [products] = useState<Product[]>([
@@ -44,6 +46,39 @@ export default function Report() {
     { name: "Carrots", category: "Vegetables", stock: 0 },
     { name: "Potatoes", category: "Vegetables", stock: 0 },
   ]);
+
+  // Helper function to get PDF font settings
+  const getPDFFontSettings = () => {
+    const sizeMap = {
+      small: "12px",
+      medium: "14px", 
+      large: "16px",
+      "x-large": "18px",
+    };
+
+    const styleMap = {
+      Arial: "Arial, sans-serif",
+      Verdana: "Verdana, sans-serif",
+      Helvetica: "Helvetica, sans-serif",
+      Tahoma: "Tahoma, sans-serif",
+      "Trebuchet MS": "Trebuchet MS, sans-serif",
+      "Times New Roman": "Times New Roman, serif",
+      Georgia: "Georgia, serif",
+      Garamond: "Garamond, serif",
+      "Courier New": "Courier New, monospace",
+      "Lucida Console": "Lucida Console, monospace",
+      "Brush Script MT": "Brush Script MT, cursive",
+      "Comic Sans MS": "Comic Sans MS, cursive",
+      Impact: "Impact, sans-serif",
+      "Sans-serif": "Arial, sans-serif",
+      Palatino: "Palatino, serif",
+    };
+
+    return {
+      fontFamily: styleMap[fontStyle],
+      fontSize: sizeMap[fontSize],
+    };
+  };
 
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
   const [timeframe, setTimeframe] = useState<"daily" | "weekly" | "monthly">(
@@ -114,6 +149,7 @@ export default function Report() {
   // Generate individual product PDF with real Recharts component
   const generateIndividualPDFWithRealChart = async (product: Product) => {
     const chartData = getTimeframeData(product);
+    const fontSettings = getPDFFontSettings();
     
     // Create a temporary container for rendering the React component
     const tempContainer = document.createElement('div');
@@ -130,7 +166,8 @@ export default function Report() {
     
     const ChartComponent = () => (
       <div style={{ 
-        fontFamily: 'Arial, sans-serif', 
+        fontFamily: fontSettings.fontFamily, 
+        fontSize: fontSettings.fontSize,
         background: 'white',
         padding: '20px'
       }}>
@@ -143,8 +180,8 @@ export default function Report() {
           borderRadius: '8px',
           marginBottom: '20px'
         }}>
-          <h1 style={{ margin: 0, fontSize: '24px' }}>{t(product.name.toLowerCase())} {t("report")}</h1>
-          <p style={{ margin: '5px 0 0 0', opacity: 0.9 }}>
+          <h1 style={{ margin: 0, fontSize: `calc(${fontSettings.fontSize} * 1.7)` }}>{t(product.name.toLowerCase())} {t("report")}</h1>
+          <p style={{ margin: '5px 0 0 0', opacity: 0.9, fontSize: `calc(${fontSettings.fontSize} * 0.9)` }}>
             {t(product.category.toLowerCase())} • {timeframe === "daily" ? t("daily") : timeframe === "weekly" ? t("weekly") : t("monthly")} {t("report")}
           </p>
         </div>
@@ -158,10 +195,10 @@ export default function Report() {
           marginBottom: '20px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
-          <h3 style={{ marginTop: 0 }}>{t("currentStockLevel")}</h3>
+          <h3 style={{ marginTop: 0, fontSize: `calc(${fontSettings.fontSize} * 1.3)` }}>{t("currentStockLevel")}</h3>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <span>{t("stockPercentage")}</span>
-            <span style={{ fontWeight: 'bold', fontSize: '18px' }}>{product.stock}%</span>
+            <span style={{ fontSize: fontSettings.fontSize }}>{t("stockPercentage")}</span>
+            <span style={{ fontWeight: 'bold', fontSize: `calc(${fontSettings.fontSize} * 1.3)` }}>{product.stock}%</span>
           </div>
           <div style={{ 
             width: '100%', 
@@ -189,7 +226,7 @@ export default function Report() {
           marginBottom: '20px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
-          <h3 style={{ marginTop: 0 }}>
+          <h3 style={{ marginTop: 0, fontSize: `calc(${fontSettings.fontSize} * 1.3)` }}>
             {t("stockHistory")} ({timeframe === "daily" ? t("daily") : timeframe === "weekly" ? t("weekly") : t("monthly")})
           </h3>
           <div style={{ height: '300px', width: '100%' }}>
@@ -270,6 +307,8 @@ export default function Report() {
 
   // Generate overview PDF with real Recharts components
   const generateOverviewPDFWithRealCharts = async () => {
+    const fontSettings = getPDFFontSettings();
+    
     // Create a temporary container for rendering the React component
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
@@ -285,7 +324,8 @@ export default function Report() {
     
     const OverviewComponent = () => (
       <div style={{ 
-        fontFamily: 'Arial, sans-serif', 
+        fontFamily: fontSettings.fontFamily, 
+        fontSize: fontSettings.fontSize,
         background: 'white',
         padding: '15px'
       }}>
@@ -298,8 +338,8 @@ export default function Report() {
           borderRadius: '8px',
           marginBottom: '15px'
         }}>
-          <h1 style={{ margin: 0, fontSize: '20px' }}>{t("freshProduceOverview")}</h1>
-          <p style={{ margin: '5px 0 0 0', opacity: 0.9, fontSize: '12px' }}>
+          <h1 style={{ margin: 0, fontSize: `calc(${fontSettings.fontSize} * 1.4)` }}>{t("freshProduceOverview")}</h1>
+          <p style={{ margin: '5px 0 0 0', opacity: 0.9, fontSize: `calc(${fontSettings.fontSize} * 0.85)` }}>
             {timeframe === "daily" ? t("daily") : timeframe === "weekly" ? t("weekly") : t("monthly")} {t("report")}
           </p>
         </div>
@@ -318,8 +358,8 @@ export default function Report() {
             padding: '10px', 
             textAlign: 'center' 
           }}>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#4f46e5' }}>{totalProducts}</div>
-            <div style={{ fontSize: '10px', color: '#666' }}>{t("totalProducts")}</div>
+            <div style={{ fontSize: `calc(${fontSettings.fontSize} * 1.3)`, fontWeight: 'bold', color: '#4f46e5' }}>{totalProducts}</div>
+            <div style={{ fontSize: `calc(${fontSettings.fontSize} * 0.7)`, color: '#666' }}>{t("totalProducts")}</div>
           </div>
           <div style={{ 
             background: 'white', 
@@ -328,8 +368,8 @@ export default function Report() {
             padding: '10px', 
             textAlign: 'center' 
           }}>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#059669' }}>{averageStock}%</div>
-            <div style={{ fontSize: '10px', color: '#666' }}>{t("averageStock")}</div>
+            <div style={{ fontSize: `calc(${fontSettings.fontSize} * 1.3)`, fontWeight: 'bold', color: '#059669' }}>{averageStock}%</div>
+            <div style={{ fontSize: `calc(${fontSettings.fontSize} * 0.7)`, color: '#666' }}>{t("averageStock")}</div>
           </div>
           <div style={{ 
             background: 'white', 
@@ -338,8 +378,8 @@ export default function Report() {
             padding: '10px', 
             textAlign: 'center' 
           }}>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#dc2626' }}>{lowStockProducts.length}</div>
-            <div style={{ fontSize: '10px', color: '#666' }}>{t("lowStockProducts")}</div>
+            <div style={{ fontSize: `calc(${fontSettings.fontSize} * 1.3)`, fontWeight: 'bold', color: '#dc2626' }}>{lowStockProducts.length}</div>
+            <div style={{ fontSize: `calc(${fontSettings.fontSize} * 0.7)`, color: '#666' }}>{t("lowStockProducts")}</div>
           </div>
         </div>
         
@@ -379,13 +419,13 @@ export default function Report() {
                   <div>
                     <div style={{ 
                       fontWeight: 'bold', 
-                      fontSize: '14px',
+                      fontSize: `calc(${fontSettings.fontSize} * 1.0)`,
                       color: '#111827'
                     }}>
                       {t(product.name.toLowerCase())}
                     </div>
                     <div style={{ 
-                      fontSize: '10px',
+                      fontSize: `calc(${fontSettings.fontSize} * 0.7)`,
                       color: '#6b7280'
                     }}>
                       {t(product.category.toLowerCase())}
@@ -398,7 +438,7 @@ export default function Report() {
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   marginBottom: '8px', 
-                  fontSize: '11px' 
+                  fontSize: `calc(${fontSettings.fontSize} * 0.8)` 
                 }}>
                   <span>{t("stockPercentage")}</span>
                   <span style={{ fontWeight: 'bold' }}>{product.stock}%</span>
