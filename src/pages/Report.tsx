@@ -420,20 +420,20 @@ export default function Report() {
                 
                 {/* Full Size Recharts Line Chart */}
                 <div style={{ 
-                  height: '140px', 
+                  height: '180px', 
                   background: '#f8fafc', 
                   borderRadius: '6px', 
-                  padding: '10px', 
+                  padding: '15px', 
                   border: '1px solid #e2e8f0' 
                 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData} margin={{ top: 5, right: 10, left: 45, bottom: 5 }}>
+                    <LineChart data={chartData} margin={{ top: 5, right: 10, left: 60, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(209,213,219,0.4)" />
                       <XAxis 
                         dataKey="time" 
                         tick={{ fontSize: 8, fill: '#6b7280' }}
-                        interval={timeframe === "monthly" ? 0 : 0}
-                        tickCount={timeframe === "monthly" ? 30 : undefined}
+                        interval={timeframe === "monthly" ? 4 : 0}
+                        tickCount={timeframe === "monthly" ? 8 : undefined}
                         angle={0}
                         textAnchor="middle"
                       />
@@ -441,8 +441,8 @@ export default function Report() {
                         domain={[0, 100]} 
                         ticks={[0, 25, 50, 75, 100]}
                         tickFormatter={(v) => `${v}%`} 
-                        tick={{ fontSize: 10, fill: '#374151' }}
-                        width={40}
+                        tick={{ fontSize: 12, fill: '#374151' }}
+                        width={60}
                       />
                       <Tooltip
                         formatter={(value: any) => [`${value}%`, t("stockLevel")]}
