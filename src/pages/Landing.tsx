@@ -8,7 +8,7 @@ export default function Landing() {
   const { t } = useTranslation();
 
   return (
-    <div className="landing-page relative" style={{ fontFamily: "'Space Grotesk', sans-serif", background: 'linear-gradient(to bottom right, #020617, #0c1e3d, #020617)' }}>
+    <div className="relative min-h-screen overflow-hidden" style={{ fontFamily: "'Space Grotesk', sans-serif", background: 'linear-gradient(to bottom right, #020617, #0c1e3d, #020617)' }}>
       {/* Animated Background */}
       <RippleGrid
         enableRainbow={false}
@@ -34,7 +34,7 @@ export default function Landing() {
           </div>
           <button
             onClick={() => navigate('/login')}
-            className="px-6 py-2 text-white font-semibold rounded-lg transition-all duration-300 hover:opacity-90 shadow-lg"
+            className="px-6 py-2 text-white font-bold rounded-lg transition-all duration-300 hover:opacity-90 shadow-lg border-2 border-white/20 hover:scale-105"
             style={{ backgroundColor: '#054E78' }}
           >
 {t("login")}

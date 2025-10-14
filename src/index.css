@@ -32,6 +32,52 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* Fix overscroll background to match landing page theme */
+html {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+  min-height: 100vh;
+  height: 100%;
+}
+
+/* Ensure root element also has the correct background */
+#root {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+  min-height: 100vh;
+}
+
+body {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Ensure overscroll areas match the landing page theme */
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+}
+
+body::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.5);
+  border-radius: 4px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.7);
+}
+
+/* Fix for mobile overscroll bounce */
+@supports (-webkit-overflow-scrolling: touch) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 .dark {
   /* Dark Mode Colors */
   --sidebar-bg: #0f172a;
@@ -118,29 +164,6 @@
 body {
   font-family: var(--app-font-family, sans-serif);
   font-size: var(--app-font-size, 16px);
-  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
-  min-height: 100vh;
-}
-
-html {
-  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-body {
-  overscroll-behavior: none;
-}
-
-/* Landing page specific styles */
-.landing-page {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  overscroll-behavior: none;
 }
 
 /* Smooth transitions for theme switching */
