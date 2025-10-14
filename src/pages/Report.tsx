@@ -204,11 +204,12 @@ export default function Report() {
                   angle={0}
                   textAnchor="middle"
                 />
-                <YAxis 
-                  domain={[0, 100]} 
-                  tickFormatter={(v) => `${v}%`} 
-                  tick={{ fontSize: 10, fill: '#374151' }} 
-                />
+                      <YAxis 
+                        domain={[0, 100]} 
+                        ticks={[0, 25, 50, 75, 100]}
+                        tickFormatter={(v) => `${v}%`} 
+                        tick={{ fontSize: 10, fill: '#374151' }} 
+                      />
                 <Tooltip
                   formatter={(value: any) => [`${value}%`, t("stockLevel")]}
                   contentStyle={{
@@ -274,7 +275,7 @@ export default function Report() {
     tempContainer.style.position = 'absolute';
     tempContainer.style.left = '-9999px';
     tempContainer.style.top = '0';
-    tempContainer.style.width = '800px';
+    tempContainer.style.width = '1200px';
     tempContainer.style.backgroundColor = 'white';
     tempContainer.style.padding = '15px';
     document.body.appendChild(tempContainer);
@@ -342,11 +343,11 @@ export default function Report() {
           </div>
         </div>
         
-        {/* Product Grid with Mini Charts */}
+        {/* Individual Product Charts - Full Size */}
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr', 
-          gap: '10px' 
+          gap: '15px' 
         }}>
           {products.map(product => {
             const chartData = getTimeframeData(product);
@@ -354,22 +355,50 @@ export default function Report() {
               <div key={product.name} style={{ 
                 background: 'white', 
                 border: '1px solid #e5e7eb', 
-                borderRadius: '6px', 
-                padding: '10px' 
+                borderRadius: '8px', 
+                padding: '15px',
+                marginBottom: '15px'
               }}>
+                {/* Product Header */}
                 <div style={{ 
-                  fontWeight: 'bold', 
-                  textAlign: 'center', 
-                  marginBottom: '8px',
-                  fontSize: '12px'
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  marginBottom: '15px' 
                 }}>
-                  {t(product.name.toLowerCase())}
+                  <img
+                    src={productImages[product.name.slice(0, -1)]}
+                    alt={product.name}
+                    style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      objectFit: 'cover', 
+                      borderRadius: '6px',
+                      marginRight: '10px'
+                    }}
+                  />
+                  <div>
+                    <div style={{ 
+                      fontWeight: 'bold', 
+                      fontSize: '14px',
+                      color: '#111827'
+                    }}>
+                      {t(product.name.toLowerCase())}
+                    </div>
+                    <div style={{ 
+                      fontSize: '10px',
+                      color: '#6b7280'
+                    }}>
+                      {t(product.category.toLowerCase())}
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Stock Level */}
                 <div style={{ 
                   display: 'flex', 
                   justifyContent: 'space-between', 
-                  marginBottom: '5px', 
-                  fontSize: '10px' 
+                  marginBottom: '8px', 
+                  fontSize: '11px' 
                 }}>
                   <span>{t("stockPercentage")}</span>
                   <span style={{ fontWeight: 'bold' }}>{product.stock}%</span>
@@ -378,8 +407,8 @@ export default function Report() {
                   width: '100%', 
                   background: '#e5e7eb', 
                   borderRadius: '4px', 
-                  height: '6px', 
-                  marginBottom: '8px' 
+                  height: '8px', 
+                  marginBottom: '15px' 
                 }}>
                   <div style={{
                     height: '100%',
@@ -389,27 +418,48 @@ export default function Report() {
                   }} />
                 </div>
                 
-                {/* Mini Recharts Line Chart */}
-                <div style={{ height: '60px', background: '#f8fafc', borderRadius: '4px', padding: '5px', border: '1px solid #e2e8f0' }}>
+                {/* Full Size Recharts Line Chart */}
+                <div style={{ 
+                  height: '140px', 
+                  background: '#f8fafc', 
+                  borderRadius: '6px', 
+                  padding: '10px', 
+                  border: '1px solid #e2e8f0' 
+                }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(209,213,219,0.3)" />
+                    <LineChart data={chartData} margin={{ top: 5, right: 10, left: 45, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(209,213,219,0.4)" />
                       <XAxis 
                         dataKey="time" 
-                        tick={false}
-                        axisLine={false}
+                        tick={{ fontSize: 8, fill: '#6b7280' }}
+                        interval={timeframe === "monthly" ? 0 : 0}
+                        tickCount={timeframe === "monthly" ? 30 : undefined}
+                        angle={0}
+                        textAnchor="middle"
                       />
                       <YAxis 
                         domain={[0, 100]} 
-                        tick={false}
-                        axisLine={false}
+                        ticks={[0, 25, 50, 75, 100]}
+                        tickFormatter={(v) => `${v}%`} 
+                        tick={{ fontSize: 10, fill: '#374151' }}
+                        width={40}
+                      />
+                      <Tooltip
+                        formatter={(value: any) => [`${value}%`, t("stockLevel")]}
+                        contentStyle={{
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: 6,
+                          color: '#111827',
+                          fontSize: 10,
+                        }}
                       />
                       <Line
                         type="monotone"
                         dataKey="value"
                         stroke="#4f46e5"
-                        strokeWidth={1}
-                        dot={false}
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
                         isAnimationActive={false}
                       />
                     </LineChart>
@@ -583,7 +633,7 @@ export default function Report() {
                     </div>
                     <div className="p-2 flex-1">
                       <div className="h-full w-full text-inherit">
-                        <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%">
                           <LineChart data={getTimeframeData(product)} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke={document.documentElement.classList.contains('dark') ? "rgba(75,85,99,0.3)" : "rgba(209,213,219,0.6)"} />
                             <XAxis 
@@ -594,7 +644,7 @@ export default function Report() {
                               angle={0}
                               textAnchor="middle"
                             />
-                            <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10, fill: "currentColor" }} />
+                            <YAxis domain={[0, 100]} ticks={[0, 25, 50, 75, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10, fill: "currentColor" }} />
                             <Tooltip
                               formatter={(value: any) => [`${value}%`, "Stock Level"]}
                               contentStyle={{
@@ -605,18 +655,18 @@ export default function Report() {
                                 fontSize: 12,
                               }}
                             />
-                            <Line
-                              type="monotone"
+                  <Line
+                    type="monotone"
                               dataKey="value"
                               name={product.name}
-                              stroke="#4f46e5"
+                    stroke="#4f46e5"
                               strokeWidth={2}
                               activeDot={{ r: 6 }}
                               isAnimationActive={false}
                             />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
                     </div>
                   </div>
                 </div>
@@ -661,9 +711,9 @@ export default function Report() {
                     </div>
                   </div>
                 </div>
-              </div>
             </div>
-          ))}
+          </div>
+        ))}
         </div>
       </div>
     </div>
@@ -721,7 +771,7 @@ export default function Report() {
                 strokeDasharray="3 3" 
                 stroke={document.documentElement.classList.contains('dark') ? "rgba(75,85,99,0.3)" : "rgba(209,213,219,0.6)"} 
               />
-            <XAxis
+              <XAxis
                       dataKey="time" 
                       tick={{ fontSize: 10, fill: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280' }}
                       interval={timeframe === "monthly" ? 0 : 0}
@@ -729,31 +779,32 @@ export default function Report() {
                       angle={0}
                       textAnchor="middle"
                       height={30}
-            />
-            <YAxis
-              domain={[0, 100]}
+              />
+              <YAxis
+                domain={[0, 100]}
+                ticks={[0, 25, 50, 75, 100]}
                 tickFormatter={(v) => `${v}%`}
                 tick={{ fontSize: 12, fill: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280' }}
               />
-                  <Tooltip
+              <Tooltip
                     formatter={(value: number) => [`${value}%`, t("stockLevel")]}
-                    contentStyle={{
+                contentStyle={{
                       backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#ffffff',
                       border: `1px solid ${document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'}`,
-                      borderRadius: 8,
+                  borderRadius: 8,
                       color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#111827',
                       fontSize: 12,
-                    }}
-                  />
-              <Line
-                type="monotone"
+                }}
+              />
+                <Line
+                  type="monotone"
                 dataKey="value"
                 stroke="#4f46e5"
-                strokeWidth={2}
+                  strokeWidth={2}
                 dot={{ r: 4 }}
-              />
-          </LineChart>
-        </ResponsiveContainer>
+                />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
