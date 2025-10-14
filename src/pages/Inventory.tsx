@@ -75,7 +75,7 @@ export default function Inventory() {
           type="text"
           onChange={(e) => setSearchTerm(e.target.value)}
           value={searchTerm}
-          placeholder="Search inventory..."
+          placeholder={t("searchInventory")}
           className="ml-2 bg-transparent border-none focus:outline-none text-sm w-40 md:w-64 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
         />
       </div>

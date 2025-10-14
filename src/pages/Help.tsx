@@ -8,17 +8,19 @@ import {
   BookOpen,
   MapIcon
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Help() {
+  const { t } = useTranslation();
   return (
     <div className="p-6 max-w-7xl mx-auto main">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">Help & Documentation</h1>
+      <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">{t("helpDocumentation")}</h1>
 
       {/* Instructional Video Section */}
       <div className="card rounded-xl p-6 mb-8">
         <div className="flex items-center mb-4">
           <PlayCircle className="text-blue-600 dark:text-blue-400 mr-3" size={28} />
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Instructional Video</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{t("instructionalVideo")}</h2>
         </div>
         
         {/* Video Placeholder */}
@@ -186,15 +188,6 @@ export default function Help() {
         </div>
       </div>
 
-      {/* Support Section */}
-      <div className="mt-8 text-center">
-        <p className="text-gray-600 dark:text-gray-400">
-          Need additional help? Contact our support team at{" "}
-          <a href="mailto:support@aistockmanagement.com" className="text-blue-600 dark:text-blue-400 hover:underline">
-            support@aistockmanagement.com
-          </a>
-        </p>
-      </div>
     </div>
   );
 }

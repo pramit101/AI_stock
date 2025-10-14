@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import {
   MenuIcon,
   BellIcon,
+  HelpCircleIcon,
   LayoutDashboardIcon,
   ListIcon,
   UploadIcon,
@@ -85,6 +86,14 @@ function Header({
         <div className="flex items-center space-x-2 md:space-x-4">
           <AnimatedThemeToggler />
 
+          <Link
+            to="/Help"
+            className="p-2 rounded-md header-hover"
+            aria-label="Help"
+          >
+            <HelpCircleIcon size={20} className="text-gray-800 dark:text-gray-200" />
+          </Link>
+
           <button
             className="p-2 rounded-md header-hover relative"
             aria-label="Notifications"
@@ -94,11 +103,13 @@ function Header({
             <span className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2" />
           </button>
           {opened && (
-            <div className="absolute p-5 right-5 top-16 w-64 rounded-xl shadow-lg bg-white border border-gray-200 z-50">
-              <ul className="divide-y divide-gray-100">
+            <div className="absolute p-5 right-5 top-16 w-64 rounded-xl shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 z-50">
+              <ul className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filterPlaceholder.map(([n, p]) => (
-                  <li key={n} className="p-3 hover:bg-gray-50">
-                    {n} are critically low at {p}%
+                  <li key={n} className="p-3 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <span className="text-gray-900 dark:text-gray-100">
+                      {t(n.toLowerCase())} {t("areCriticallyLow")} {p}%
+                    </span>
                   </li>
                 ))}
               </ul>

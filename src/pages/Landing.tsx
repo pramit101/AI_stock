@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import RippleGrid from '../components/magicui/RippleGrid';
 import { ArrowRight } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <div className="relative min-h-screen overflow-hidden" style={{ fontFamily: "'Space Grotesk', sans-serif", background: 'linear-gradient(to bottom right, #020617, #0c1e3d, #020617)' }}>
@@ -35,7 +37,7 @@ export default function Landing() {
             className="px-6 py-2 text-white rounded-lg transition-all duration-300 hover:opacity-90"
             style={{ backgroundColor: '#054E78' }}
           >
-            Login
+{t("login")}
           </button>
         </header>
 
@@ -46,7 +48,7 @@ export default function Landing() {
               {/* Main Heading */}
               <div className="space-y-6">
                 <h2 className="text-6xl md:text-8xl font-black text-white leading-tight tracking-tight">
-                  PentaVision
+                  {t("pentavision")}
                 </h2>
                 <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
                   AI-Powered Inventory Management: Transforming the fresh produce shelf with AI technology to insights
