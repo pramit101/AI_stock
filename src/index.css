@@ -167,3 +167,96 @@ body {
 .dark .overflow-auto {
   background-color: var(--main-bg);
 }
+
+/* Print/PDF specific styles for better output */
+@media print {
+  /* Hide elements that shouldn't appear in PDF */
+  .export-buttons,
+  .no-print,
+  button[class*="export"],
+  .modal-backdrop {
+    display: none !important;
+  }
+  
+  /* Optimize modal for print */
+  .modal {
+    position: static !important;
+    transform: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* Ensure charts render properly */
+  .chart-container,
+  .h-64,
+  .h-48 {
+    height: auto !important;
+    min-height: 300px !important;
+    page-break-inside: avoid;
+  }
+  
+  /* Better text rendering */
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Force white background for all elements in print */
+  * {
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Ensure proper spacing */
+  .space-y-6 > * + * {
+    margin-top: 1.5rem !important;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 1rem !important;
+  }
+  
+  /* Page breaks */
+  .page-break-before {
+    page-break-before: always;
+  }
+  
+  .page-break-after {
+    page-break-after: always;
+  }
+  
+  .no-page-break {
+    page-break-inside: avoid;
+  }
+  
+  /* Chart optimization */
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Grid layouts for print */
+  .grid {
+    display: block !important;
+  }
+  
+  .grid > * {
+    display: block !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* Additional PDF-specific styles for html2pdf */
+.pdf-optimized {
+  background: white !important;
+  color: black !important;
+}
+
+.pdf-optimized * {
+  background: white !important;
+  color: black !important;
+}

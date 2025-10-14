@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { FileText } from "lucide-react";
-import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   LineChart,
   Line,
@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useTranslation } from "react-i18next";
+import { createRoot } from "react-dom/client";
 
 interface Product {
   name: string;
@@ -33,38 +34,15 @@ const productImages: { [key: string]: string } = {
 
 export default function Report() {
   const { t } = useTranslation();
+  
+  // Get real data from Inventory page - but keep it blank (0%) since no uploads yet
   const [products] = useState<Product[]>([
-    {
-      name: "Bananas",
-      category: "Fruits",
-      stock: 0, // No mock data - real data only
-      history: [0],
-    },
-    { name: "Apples", category: "Fruits", stock: 0, history: [0] },
-    {
-      name: "Cucumbers",
-      category: "Vegetables",
-      stock: 0,
-      history: [0],
-    },
-    {
-      name: "Tomatoes",
-      category: "Vegetables",
-      stock: 0,
-      history: [0],
-    },
-    {
-      name: "Carrots",
-      category: "Vegetables",
-      stock: 0,
-      history: [0],
-    },
-    {
-      name: "Potatoes",
-      category: "Vegetables",
-      stock: 0,
-      history: [0],
-    },
+    { name: "Bananas", category: "Fruits", stock: 0 },
+    { name: "Apples", category: "Fruits", stock: 0 },
+    { name: "Cucumbers", category: "Vegetables", stock: 0 },
+    { name: "Tomatoes", category: "Vegetables", stock: 0 },
+    { name: "Carrots", category: "Vegetables", stock: 0 },
+    { name: "Potatoes", category: "Vegetables", stock: 0 },
   ]);
 
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
@@ -82,7 +60,7 @@ export default function Report() {
   const handleReportClick = (report: string) => setSelectedReport(report);
   const handleCloseModal = () => setSelectedReport(null);
 
-  // Generate timeframe-based data similar to SingleProduceChart
+  // Generate simple chart data based on timeframe - using real stock values
   const getTimeframeData = (product: Product) => {
     const currentStock = product.stock;
     
@@ -119,74 +97,363 @@ export default function Report() {
     }));
   };
 
-  // ✅ PDF export - type-safe and hides buttons
+  // 🚀 CAPTURE REAL CHARTS: Use actual Recharts components from individual pages
   const exportToPDF = async (product?: Product) => {
-    if (!reportRef.current) return;
-
-    const reportElement = reportRef.current as HTMLElement;
-
-    // For overview, show charts section during PDF generation
-    let chartsSection: HTMLElement | null = null;
-    if (!product && selectedReport === "Overview") {
-      chartsSection = reportElement.querySelector('.mt-8[style*="display: none"]') as HTMLElement;
-      if (chartsSection) {
-        chartsSection.style.display = 'block';
+    try {
+      if (product) {
+        await generateIndividualPDFWithRealChart(product);
+      } else {
+        await generateOverviewPDFWithRealCharts();
       }
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      alert('PDF generation failed. Please try again.');
     }
-
-    // Hide download buttons during capture
-    const buttons = reportElement.querySelectorAll(".export-buttons");
-    buttons.forEach((btn) => {
-      (btn as HTMLElement).style.display = "none";
-    });
-
-    // Save original styles
-    const originalOverflow = reportElement.style.overflow;
-    const originalMaxHeight = reportElement.style.maxHeight;
-
-    reportElement.style.overflow = "visible";
-    reportElement.style.maxHeight = "none";
-
-    // Wait a moment for charts to render
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Capture canvas
-    const canvas = await html2canvas(reportElement, {
-      scale: 2,
-      backgroundColor: "#ffffff",
-    } as any);
-    const imgData = canvas.toDataURL("image/png");
-
-    const pdf = new jsPDF("p", "mm", "a4");
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    while (heightLeft > 0) {
-      pdf.addImage(imgData, "PNG", 0, -position, imgWidth, imgHeight);
-      heightLeft -= pdfHeight;
-      position += pdfHeight;
-      if (heightLeft > 0) pdf.addPage();
-    }
-
-    pdf.save(`${product ? product.name : "overview"}-report.pdf`);
-
-    // Restore charts section visibility
-    if (chartsSection) {
-      chartsSection.style.display = 'none';
-    }
-
-    // Restore buttons and original styles
-    buttons.forEach((btn) => {
-      (btn as HTMLElement).style.display = "";
-    });
-    reportElement.style.overflow = originalOverflow;
-    reportElement.style.maxHeight = originalMaxHeight;
   };
+
+  // Generate individual product PDF with real Recharts component
+  const generateIndividualPDFWithRealChart = async (product: Product) => {
+    const chartData = getTimeframeData(product);
+    
+    // Create a temporary container for rendering the React component
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0';
+    tempContainer.style.width = '800px';
+    tempContainer.style.backgroundColor = 'white';
+    tempContainer.style.padding = '20px';
+    document.body.appendChild(tempContainer);
+    
+    // Create React root and render the chart component
+    const root = createRoot(tempContainer);
+    
+    const ChartComponent = () => (
+      <div style={{ 
+        fontFamily: 'Arial, sans-serif', 
+        background: 'white',
+        padding: '20px'
+      }}>
+        {/* Header */}
+        <div style={{
+          textAlign: 'center',
+          padding: '20px',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          borderRadius: '8px',
+          marginBottom: '20px'
+        }}>
+          <h1 style={{ margin: 0, fontSize: '24px' }}>{t(product.name.toLowerCase())} {t("report")}</h1>
+          <p style={{ margin: '5px 0 0 0', opacity: 0.9 }}>
+            {t(product.category.toLowerCase())} • {timeframe === "daily" ? t("daily") : timeframe === "weekly" ? t("weekly") : t("monthly")} {t("report")}
+          </p>
+        </div>
+        
+        {/* Current Stock Level */}
+        <div style={{
+          background: 'white',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          padding: '20px',
+          marginBottom: '20px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={{ marginTop: 0 }}>{t("currentStockLevel")}</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+            <span>{t("stockPercentage")}</span>
+            <span style={{ fontWeight: 'bold', fontSize: '18px' }}>{product.stock}%</span>
+          </div>
+          <div style={{ 
+            width: '100%', 
+            background: '#e5e7eb', 
+            borderRadius: '8px', 
+            height: '20px', 
+            overflow: 'hidden',
+            marginTop: '10px'
+          }}>
+            <div style={{
+              height: '100%',
+              borderRadius: '8px',
+              width: `${product.stock}%`,
+              background: product.stock < 30 ? '#dc2626' : product.stock < 60 ? '#f59e0b' : '#10b981'
+            }} />
+          </div>
+        </div>
+        
+        {/* Real Recharts Line Chart */}
+        <div style={{
+          background: 'white',
+          border: '1px solid #e5e7eb',
+          borderRadius: '8px',
+          padding: '20px',
+          marginBottom: '20px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={{ marginTop: 0 }}>
+            {t("stockHistory")} ({timeframe === "daily" ? t("daily") : timeframe === "weekly" ? t("weekly") : t("monthly")})
+          </h3>
+          <div style={{ height: '300px', width: '100%' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(209,213,219,0.6)" />
+                <XAxis 
+                  dataKey="time" 
+                  tick={{ fontSize: 10, fill: '#374151' }}
+                  interval={timeframe === "monthly" ? 0 : 0}
+                  tickCount={timeframe === "monthly" ? 30 : undefined}
+                  angle={0}
+                  textAnchor="middle"
+                />
+                <YAxis 
+                  domain={[0, 100]} 
+                  tickFormatter={(v) => `${v}%`} 
+                  tick={{ fontSize: 10, fill: '#374151' }} 
+                />
+                <Tooltip
+                  formatter={(value: any) => [`${value}%`, t("stockLevel")]}
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: 8,
+                    color: '#111827',
+                    fontSize: 12,
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#4f46e5"
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                  isAnimationActive={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    );
+    
+    root.render(<ChartComponent />);
+    
+    // Wait for chart to render
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Capture with html2canvas
+    const canvas = await html2canvas(tempContainer, {
+      background: '#ffffff',
+      useCORS: true,
+      allowTaint: true,
+    });
+    
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    const imgWidth = 210;
+    const pageHeight = 295;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    const scale = imgHeight > pageHeight ? pageHeight / imgHeight : 1;
+    const finalWidth = imgWidth * scale;
+    const finalHeight = imgHeight * scale;
+    
+    pdf.addImage(imgData, 'PNG', (210 - finalWidth) / 2, (295 - finalHeight) / 2, finalWidth, finalHeight);
+    pdf.save(`${product.name}-report-${timeframe}.pdf`);
+    
+    // Cleanup
+    root.unmount();
+    document.body.removeChild(tempContainer);
+    console.log('Individual PDF with real chart generated successfully');
+  };
+
+
+  // Generate overview PDF with real Recharts components
+  const generateOverviewPDFWithRealCharts = async () => {
+    // Create a temporary container for rendering the React component
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0';
+    tempContainer.style.width = '800px';
+    tempContainer.style.backgroundColor = 'white';
+    tempContainer.style.padding = '15px';
+    document.body.appendChild(tempContainer);
+    
+    // Create React root and render the overview component
+    const root = createRoot(tempContainer);
+    
+    const OverviewComponent = () => (
+      <div style={{ 
+        fontFamily: 'Arial, sans-serif', 
+        background: 'white',
+        padding: '15px'
+      }}>
+        {/* Header */}
+        <div style={{
+          textAlign: 'center',
+          padding: '15px',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          borderRadius: '8px',
+          marginBottom: '15px'
+        }}>
+          <h1 style={{ margin: 0, fontSize: '20px' }}>{t("freshProduceOverview")}</h1>
+          <p style={{ margin: '5px 0 0 0', opacity: 0.9, fontSize: '12px' }}>
+            {timeframe === "daily" ? t("daily") : timeframe === "weekly" ? t("weekly") : t("monthly")} {t("report")}
+          </p>
+        </div>
+        
+        {/* Stats */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '1fr 1fr 1fr', 
+          gap: '10px', 
+          marginBottom: '15px' 
+        }}>
+          <div style={{ 
+            background: 'white', 
+            border: '1px solid #e5e7eb', 
+            borderRadius: '6px', 
+            padding: '10px', 
+            textAlign: 'center' 
+          }}>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#4f46e5' }}>{totalProducts}</div>
+            <div style={{ fontSize: '10px', color: '#666' }}>{t("totalProducts")}</div>
+          </div>
+          <div style={{ 
+            background: 'white', 
+            border: '1px solid #e5e7eb', 
+            borderRadius: '6px', 
+            padding: '10px', 
+            textAlign: 'center' 
+          }}>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#059669' }}>{averageStock}%</div>
+            <div style={{ fontSize: '10px', color: '#666' }}>{t("averageStock")}</div>
+          </div>
+          <div style={{ 
+            background: 'white', 
+            border: '1px solid #e5e7eb', 
+            borderRadius: '6px', 
+            padding: '10px', 
+            textAlign: 'center' 
+          }}>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#dc2626' }}>{lowStockProducts.length}</div>
+            <div style={{ fontSize: '10px', color: '#666' }}>{t("lowStockProducts")}</div>
+          </div>
+        </div>
+        
+        {/* Product Grid with Mini Charts */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '1fr 1fr', 
+          gap: '10px' 
+        }}>
+          {products.map(product => {
+            const chartData = getTimeframeData(product);
+            return (
+              <div key={product.name} style={{ 
+                background: 'white', 
+                border: '1px solid #e5e7eb', 
+                borderRadius: '6px', 
+                padding: '10px' 
+              }}>
+                <div style={{ 
+                  fontWeight: 'bold', 
+                  textAlign: 'center', 
+                  marginBottom: '8px',
+                  fontSize: '12px'
+                }}>
+                  {t(product.name.toLowerCase())}
+                </div>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  marginBottom: '5px', 
+                  fontSize: '10px' 
+                }}>
+                  <span>{t("stockPercentage")}</span>
+                  <span style={{ fontWeight: 'bold' }}>{product.stock}%</span>
+                </div>
+                <div style={{ 
+                  width: '100%', 
+                  background: '#e5e7eb', 
+                  borderRadius: '4px', 
+                  height: '6px', 
+                  marginBottom: '8px' 
+                }}>
+                  <div style={{
+                    height: '100%',
+                    borderRadius: '4px',
+                    width: `${product.stock}%`,
+                    background: product.stock < 30 ? '#dc2626' : product.stock < 60 ? '#f59e0b' : '#10b981'
+                  }} />
+                </div>
+                
+                {/* Mini Recharts Line Chart */}
+                <div style={{ height: '60px', background: '#f8fafc', borderRadius: '4px', padding: '5px', border: '1px solid #e2e8f0' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(209,213,219,0.3)" />
+                      <XAxis 
+                        dataKey="time" 
+                        tick={false}
+                        axisLine={false}
+                      />
+                      <YAxis 
+                        domain={[0, 100]} 
+                        tick={false}
+                        axisLine={false}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#4f46e5"
+                        strokeWidth={1}
+                        dot={false}
+                        isAnimationActive={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+    
+    root.render(<OverviewComponent />);
+    
+    // Wait for charts to render
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Capture with html2canvas
+    const canvas = await html2canvas(tempContainer, {
+      background: '#ffffff',
+      useCORS: true,
+      allowTaint: true,
+    });
+    
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    const imgWidth = 210;
+    const pageHeight = 295;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    const scale = imgHeight > pageHeight ? pageHeight / imgHeight : 1;
+    const finalWidth = imgWidth * scale;
+    const finalHeight = imgHeight * scale;
+    
+    pdf.addImage(imgData, 'PNG', (210 - finalWidth) / 2, (295 - finalHeight) / 2, finalWidth, finalHeight);
+    pdf.save(`overview-report-${timeframe}.pdf`);
+    
+    // Cleanup
+    root.unmount();
+    document.body.removeChild(tempContainer);
+    console.log('Overview PDF with real charts generated successfully');
+  };
+
 
   const exportToCSV = (product?: Product) => {
     let csvContent = "data:text/csv;charset=utf-8,";
@@ -227,16 +494,16 @@ export default function Report() {
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-lg text-gray-900 dark:text-gray-100">
-            <p>
+        <p>
               <strong>{t("totalProducts")}:</strong> {totalProducts}
-            </p>
-            <p>
+        </p>
+        <p>
               <strong>{t("averageStock")}:</strong> {averageStock}%
-            </p>
-            <p>
+        </p>
+        <p>
               <strong>{t("lowStockProducts")}:</strong>{" "}
               {lowStockProducts.map((p) => t(p.name.toLowerCase())).join(", ") || t("none")}
-            </p>
+        </p>
       </div>
 
       {/* Simple product cards with current stock */}
@@ -277,64 +544,123 @@ export default function Report() {
         ))}
       </div>
 
-      {/* Individual Product Charts - only visible when generating PDF */}
-      <div className="mt-8" style={{ display: 'none' }}>
-            <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
-              {t("individualProductCharts")}
-            </h3>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Individual Product Charts - using line graphs consistently */}
+      <div className="mt-8 no-page-break" style={{ display: 'none' }}>
+        <h3 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center">
+          {t("individualProductCharts")}
+        </h3>
+        <div className="grid grid-cols-1 gap-8">
           {products.map((product) => (
-            <div key={product.name} className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
-              <div className="flex items-center space-x-3 mb-4">
+            <div key={product.name} className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow no-page-break">
+              <div className="flex items-center space-x-4 mb-6">
                 <img
                   src={productImages[product.name.slice(0, -1)]}
                   alt={product.name}
-                  className="product-image w-8 h-8 object-cover rounded-lg"
+                  className="product-image w-12 h-12 object-cover rounded-lg"
                 />
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {t(product.name.toLowerCase())}
-                </h4>
+                <div>
+                  <h4 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                    {t(product.name.toLowerCase())}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {t(product.category.toLowerCase())}
+                  </p>
+                </div>
               </div>
-              <div className="h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={getTimeframeData(product)}>
-                    <CartesianGrid 
-                      strokeDasharray="3 3" 
-                      stroke={document.documentElement.classList.contains('dark') ? "rgba(75,85,99,0.3)" : "rgba(209,213,219,0.6)"} 
-                    />
-                    <XAxis 
-                      dataKey="time" 
-                      tick={{ fontSize: 8, fill: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280' }}
-                      interval={timeframe === "monthly" ? 0 : 0}
-                      tickCount={timeframe === "monthly" ? 30 : undefined}
-                      angle={0}
-                      textAnchor="middle"
-                      height={25}
-                    />
-                    <YAxis 
-                      domain={[0, 100]} 
-                      tickFormatter={(v) => `${v}%`}
-                      tick={{ fontSize: 10, fill: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280' }}
-                    />
-                  <Tooltip
-                    formatter={(value: number) => [`${value}%`, t("stockLevel")]}
-                    contentStyle={{
-                      backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : '#ffffff',
-                      border: `1px solid ${document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'}`,
-                      borderRadius: 8,
-                      color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#111827',
-                      fontSize: 12,
-                    }}
-                  />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#4f46e5"
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+              
+              {/* Line Chart with Stock Level */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Line Chart */}
+                <div className="h-80 chart-container">
+                  <div className="bg-white dark:bg-gray-900 rounded-lg shadow h-full flex flex-col text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-800">
+                    <div className="p-3 border-b border-gray-200 dark:border-gray-800">
+                      <div>
+                        <h5 className="text-lg font-medium">{product.name} Stock Trends</h5>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Stock levels ({timeframe === "daily" ? "throughout the day" : timeframe === "weekly" ? "daily over the week" : "daily over the month"})
+                        </p>
+                      </div>
+                    </div>
+                    <div className="p-2 flex-1">
+                      <div className="h-full w-full text-inherit">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={getTimeframeData(product)} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke={document.documentElement.classList.contains('dark') ? "rgba(75,85,99,0.3)" : "rgba(209,213,219,0.6)"} />
+                            <XAxis 
+                              dataKey="time" 
+                              tick={{ fontSize: 10, fill: "currentColor" }}
+                              interval={timeframe === "monthly" ? 0 : 0}
+                              tickCount={timeframe === "monthly" ? 30 : undefined}
+                              angle={0}
+                              textAnchor="middle"
+                            />
+                            <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10, fill: "currentColor" }} />
+                            <Tooltip
+                              formatter={(value: any) => [`${value}%`, "Stock Level"]}
+                              contentStyle={{
+                                background: document.documentElement.classList.contains('dark') ? '#111827' : '#ffffff',
+                                border: `1px solid ${document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'}`,
+                                borderRadius: 8,
+                                color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#111827',
+                                fontSize: 12,
+                              }}
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="value"
+                              name={product.name}
+                              stroke="#4f46e5"
+                              strokeWidth={2}
+                              activeDot={{ r: 6 }}
+                              isAnimationActive={false}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CurrentStockLevel component */}
+                <div className="h-80">
+                  <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow h-full flex flex-col text-gray-900 dark:text-gray-100">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center">
+                        <div className="w-5 h-5 bg-blue-600 dark:bg-blue-400 rounded mr-2"></div>
+                        <h5 className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                          Current Stock Level
+                        </h5>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Stock percentage</p>
+                    </div>
+                    <div className="p-4 flex-1 flex flex-col justify-center">
+                      <div className="text-center mb-4">
+                        <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">{product.name}</span>
+                      </div>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-gray-700 dark:text-gray-300">Current Stock</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{product.stock}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-4 mb-4">
+                        <div
+                          className={`h-4 rounded-full transition-all duration-500 ${
+                            product.stock < 30 ? 'bg-red-500' : product.stock < 60 ? 'bg-yellow-500' : 'bg-green-500'
+                          }`}
+                          style={{ width: `${product.stock}%` }}
+                        />
+                      </div>
+                      <div className="text-center">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                          product.stock < 30 ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' :
+                          product.stock < 60 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                          'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                        }`}>
+                          {product.stock < 30 ? 'Low Stock' : product.stock < 60 ? 'Medium Stock' : 'High Stock'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
@@ -348,7 +674,7 @@ export default function Report() {
       <div className="flex items-center space-x-4 mb-6">
         <img
           src={productImages[product.name.slice(0, -1)]}
-          alt={product.name}
+        alt={product.name}
           className="product-image w-16 h-16 object-cover rounded-lg shadow"
         />
         <div>
@@ -384,18 +710,18 @@ export default function Report() {
       </div>
 
       {/* Stock History Chart with Timeframe */}
-      <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow">
+      <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow no-page-break">
             <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-gray-100">
               {t("stockHistory")} ({timeframe === "daily" ? t("daily") : timeframe === "weekly" ? t("weekly") : t("monthly")})
             </h4>
-        <div className="h-64">
+        <div className="h-64 chart-container">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={getTimeframeData(product)}>
               <CartesianGrid 
                 strokeDasharray="3 3" 
                 stroke={document.documentElement.classList.contains('dark') ? "rgba(75,85,99,0.3)" : "rgba(209,213,219,0.6)"} 
               />
-                    <XAxis 
+            <XAxis
                       dataKey="time" 
                       tick={{ fontSize: 10, fill: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280' }}
                       interval={timeframe === "monthly" ? 0 : 0}
@@ -403,9 +729,9 @@ export default function Report() {
                       angle={0}
                       textAnchor="middle"
                       height={30}
-                    />
-              <YAxis 
-                domain={[0, 100]} 
+            />
+            <YAxis
+              domain={[0, 100]}
                 tickFormatter={(v) => `${v}%`}
                 tick={{ fontSize: 12, fill: document.documentElement.classList.contains('dark') ? '#d1d5db' : '#6b7280' }}
               />
@@ -426,8 +752,8 @@ export default function Report() {
                 strokeWidth={2}
                 dot={{ r: 4 }}
               />
-            </LineChart>
-          </ResponsiveContainer>
+          </LineChart>
+        </ResponsiveContainer>
         </div>
       </div>
     </div>
@@ -449,11 +775,11 @@ export default function Report() {
             className="card rounded-lg p-4 text-center hover:shadow-lg transition-shadow"
           >
             <div className="w-full h-32 mb-2 flex items-center justify-center">
-              <img
+            <img
                 src={productImages[p.name.slice(0, -1)]}
-                alt={p.name}
+              alt={p.name}
                 className="product-image w-full h-full object-cover rounded-lg"
-              />
+            />
             </div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t(p.name.toLowerCase())}</h3>
           </button>

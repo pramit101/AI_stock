@@ -32,7 +32,9 @@ const resources = {
       lowestStockItem: "Lowest Stock Item",
       noItemsToDisplay: "No items to display",
       areCriticallyLow: "are critically low at",
+      chartWillBeRenderedHere: "Chart will be rendered here",
       report: "Report",
+      standard: "Standard",
       uploadProducePrompt: "Upload pictures or videos of your produce here.",
 
       name: "Name",
@@ -228,6 +230,7 @@ const resources = {
       lowestStockItem: "库存最低的项目",
       noItemsToDisplay: "没有要显示的项目",
       areCriticallyLow: "严重不足，仅剩",
+      chartWillBeRenderedHere: "图表将在此处渲染",
 
       name: "姓名",
       email: "电子邮件",
@@ -424,6 +427,7 @@ const resources = {
       lowestStockItem: "Artículo con menor stock",
       noItemsToDisplay: "No hay elementos para mostrar",
       areCriticallyLow: "están críticamente bajos al",
+      chartWillBeRenderedHere: "El gráfico se renderizará aquí",
       report: "Informe",
       uploadProducePrompt: "Sube fotos o videos de tus productos aquí.",
 
@@ -620,6 +624,7 @@ const resources = {
       lowestStockItem: "Article le plus bas en stock",
       noItemsToDisplay: "Aucun élément à afficher",
       areCriticallyLow: "sont très bas à",
+      chartWillBeRenderedHere: "Le graphique sera rendu ici",
       report: "Rapport",
       uploadProducePrompt: "Téléchargez ici des photos ou des vidéos de vos produits.",
 
