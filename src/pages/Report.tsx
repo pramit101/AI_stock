@@ -158,7 +158,8 @@ export default function Report() {
     tempContainer.style.top = '0';
     tempContainer.style.width = '800px';
     tempContainer.style.backgroundColor = 'white';
-    tempContainer.style.padding = '20px';
+    tempContainer.style.padding = '15px';
+    tempContainer.style.boxSizing = 'border-box';
     document.body.appendChild(tempContainer);
     
     // Create React root and render the chart component
@@ -229,7 +230,7 @@ export default function Report() {
           <h3 style={{ marginTop: 0, fontSize: `calc(${fontSettings.fontSize} * 1.3)` }}>
             {t("stockHistory")} ({timeframe === "daily" ? t("daily") : timeframe === "weekly" ? t("weekly") : t("monthly")})
           </h3>
-          <div style={{ height: '300px', width: '100%' }}>
+          <div style={{ height: '350px', width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(209,213,219,0.6)" />
@@ -287,15 +288,19 @@ export default function Report() {
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     
-    const imgWidth = 210;
-    const pageHeight = 295;
+    const imgWidth = 200; // Reduced width for better margins
+    const pageHeight = 287; // Reduced height to account for margins
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
     const scale = imgHeight > pageHeight ? pageHeight / imgHeight : 1;
     const finalWidth = imgWidth * scale;
     const finalHeight = imgHeight * scale;
     
-    pdf.addImage(imgData, 'PNG', (210 - finalWidth) / 2, (295 - finalHeight) / 2, finalWidth, finalHeight);
+    // Position from top with proper margins
+    const marginTop = 5; // Top margin
+    const marginLeft = (210 - finalWidth) / 2; // Center horizontally
+    
+    pdf.addImage(imgData, 'PNG', marginLeft, marginTop, finalWidth, finalHeight);
     pdf.save(`${product.name}-report-${timeframe}.pdf`);
     
     // Cleanup
@@ -316,7 +321,8 @@ export default function Report() {
     tempContainer.style.top = '0';
     tempContainer.style.width = '1200px';
     tempContainer.style.backgroundColor = 'white';
-    tempContainer.style.padding = '15px';
+    tempContainer.style.padding = '12px';
+    tempContainer.style.boxSizing = 'border-box';
     document.body.appendChild(tempContainer);
     
     // Create React root and render the overview component
@@ -460,10 +466,10 @@ export default function Report() {
                 
                 {/* Full Size Recharts Line Chart */}
                 <div style={{ 
-                  height: '180px', 
+                  height: '200px', 
                   background: '#f8fafc', 
                   borderRadius: '6px', 
-                  padding: '15px', 
+                  padding: '12px', 
                   border: '1px solid #e2e8f0' 
                 }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -527,15 +533,19 @@ export default function Report() {
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     
-    const imgWidth = 210;
-    const pageHeight = 295;
+    const imgWidth = 200; // Reduced width for better margins
+    const pageHeight = 287; // Reduced height to account for margins
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
     const scale = imgHeight > pageHeight ? pageHeight / imgHeight : 1;
     const finalWidth = imgWidth * scale;
     const finalHeight = imgHeight * scale;
     
-    pdf.addImage(imgData, 'PNG', (210 - finalWidth) / 2, (295 - finalHeight) / 2, finalWidth, finalHeight);
+    // Position from top with proper margins
+    const marginTop = 5; // Top margin
+    const marginLeft = (210 - finalWidth) / 2; // Center horizontally
+    
+    pdf.addImage(imgData, 'PNG', marginLeft, marginTop, finalWidth, finalHeight);
     pdf.save(`overview-report-${timeframe}.pdf`);
     
     // Cleanup
