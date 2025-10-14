@@ -11,7 +11,7 @@ import {
 
 export default function Help() {
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto main">
       <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">Help & Documentation</h1>
 
       {/* Instructional Video Section */}

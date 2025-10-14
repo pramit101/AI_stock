@@ -1,14 +1,26 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 // ---------- Types ----------
 type RangeKey = "day" | "week" | "month";
 type Point = {
   time: string;
-  apples: number; bananas: number; cucumbers: number;
-  carrots: number; potatoes: number; tomatoes: number;
+  apples: number;
+  bananas: number;
+  cucumbers: number;
+  carrots: number;
+  potatoes: number;
+  tomatoes: number;
 };
 type RangeData = { day?: Point[]; week?: Point[]; month?: Point[] };
 
@@ -25,12 +37,12 @@ type StockChartsProps = {
 
 // ---------- Helpers ----------
 const PRODUCE_KEYS = [
-  { key: "apples",     label: "Apples",     color: "#eb4031ff" },
-  { key: "bananas",    label: "Bananas",    color: "#cedd2cff" },
-  { key: "cucumbers",  label: "Cucumbers",  color: "#3fa21fff" },
-  { key: "carrots",    label: "Carrots",    color: "#ea9a10ff" },
-  { key: "potatoes",   label: "Potatoes",   color: "#4f3ee7ff" },
-  { key: "tomatoes",   label: "Tomatoes",   color: "#910c7fff" },
+  { key: "apples", label: "Apples", color: "#eb4031ff" },
+  { key: "bananas", label: "Bananas", color: "#cedd2cff" },
+  { key: "cucumbers", label: "Cucumbers", color: "#3fa21fff" },
+  { key: "carrots", label: "Carrots", color: "#ea9a10ff" },
+  { key: "potatoes", label: "Potatoes", color: "#4f3ee7ff" },
+  { key: "tomatoes", label: "Tomatoes", color: "#910c7fff" },
 ] as const;
 
 function clampPct(n: number) {
@@ -53,10 +65,17 @@ function normalizeSeries(points: any[] | undefined): Point[] {
 
 // tiny helper to check theme at render-time
 function isDark() {
-  return typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+  return (
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark")
+  );
 }
 
-function usePolledSeries(endpoint?: string, range: RangeKey = "day", intervalMs = 5000) {
+function usePolledSeries(
+  endpoint?: string,
+  range: RangeKey = "day",
+  intervalMs = 5000
+) {
   const [series, setSeries] = useState<Point[]>([]);
   const timerRef = useRef<number | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -79,7 +98,10 @@ function usePolledSeries(endpoint?: string, range: RangeKey = "day", intervalMs 
     };
 
     fetchOnce();
-    timerRef.current = window.setInterval(fetchOnce, intervalMs) as unknown as number;
+    timerRef.current = window.setInterval(
+      fetchOnce,
+      intervalMs
+    ) as unknown as number;
 
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
@@ -109,6 +131,8 @@ export function StockCharts({
   // B: polled data (when endpoint present)
   const polled = usePolledSeries(endpoint, range, intervalMs);
 
+  const { t } = useTranslation();
+
   // Source of truth
   const chartData: Point[] = useMemo(() => {
     if (controlled && controlled.length) return controlled;
@@ -116,35 +140,144 @@ export function StockCharts({
     // fallback placeholder (so the card renders before AI data)
     if (range === "day") {
       return [
-        { time: "7AM",  apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "10AM", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "1PM",  apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "4PM",  apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "7PM",  apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time: "10PM", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
+        {
+          time: "7AM",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "10AM",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "1PM",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "4PM",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "7PM",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "10PM",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
       ];
     }
     if (range === "week") {
       return [
-        { time:"Mon", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Tue", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Wed", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Thu", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Fri", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Sat", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
-        { time:"Sun", apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0 },
+        {
+          time: "Mon",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "Tue",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "Wed",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "Thu",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "Fri",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "Sat",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
+        {
+          time: "Sun",
+          apples: 0,
+          bananas: 0,
+          cucumbers: 0,
+          carrots: 0,
+          potatoes: 0,
+          tomatoes: 0,
+        },
       ];
     }
     // month (e.g., 1..30)
     return Array.from({ length: 30 }, (_, i) => ({
       time: String(i + 1),
-      apples:0, bananas:0, cucumbers:0, carrots:0, potatoes:0, tomatoes:0,
+      apples: 0,
+      bananas: 0,
+      cucumbers: 0,
+      carrots: 0,
+      potatoes: 0,
+      tomatoes: 0,
     }));
   }, [controlled, polled, range]);
 
   const dark = isDark();
   const axisTick = { fontSize: 10, fill: "currentColor" as const }; // SVG uses currentColor from container
-  const gridStroke = dark ? "rgba(75,85,99,0.3)" : "rgba(209,213,219,0.6)";   // gray-600 / gray-300
+  const gridStroke = dark ? "rgba(75,85,99,0.3)" : "rgba(209,213,219,0.6)"; // gray-600 / gray-300
   const tooltipStyles = {
     contentStyle: {
       background: dark ? "#111827" : "#ffffff", // gray-900 / white
@@ -161,15 +294,21 @@ export function StockCharts({
     <div className="bg-white dark:bg-gray-900 rounded-lg shadow h-full flex flex-col text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-800">
       <div className="p-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium">Inventory Trends</h3>
+          <h3 className="text-lg font-medium">{t("inventoryTrends")}</h3>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Stock levels ({range === "day" ? "throughout the day" : range === "week" ? "daily over the week" : "daily over the month"})
+            (
+            {range === "day"
+              ? "throughout the day"
+              : range === "week"
+              ? "daily over the week"
+              : "daily over the month"}
+            )
           </p>
         </div>
 
         {/* Range switcher */}
         <div className="flex items-center gap-1 text-xs">
-          {(["day","week","month"] as RangeKey[]).map(r => (
+          {(["day", "week", "month"] as RangeKey[]).map((r) => (
             <button
               key={r}
               onClick={() => setRange(r)}
@@ -187,26 +326,37 @@ export function StockCharts({
       </div>
 
       <div className="p-2 flex-1">
-        <div className="h-full w-full text-inherit"> {/* sets currentColor for SVG ticks/legend */}
+        <div className="h-full w-full text-inherit">
+          {" "}
+          {/* sets currentColor for SVG ticks/legend */}
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+            <LineChart
+              data={chartData}
+              margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
               <XAxis dataKey="time" tick={axisTick} />
-              <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={axisTick} />
+              <YAxis
+                domain={[0, 100]}
+                tickFormatter={(v) => `${v}%`}
+                tick={axisTick}
+              />
               <Tooltip
                 formatter={(value: any) => [`${value}%`, "Stock Level"]}
                 {...tooltipStyles}
               />
               <Legend
                 wrapperStyle={{ fontSize: "10px", color: "inherit" }}
-                formatter={(value) => <span style={{ color: "inherit" }}>{value}</span>}
+                formatter={(value) => (
+                  <span style={{ color: "inherit" }}>{value}</span>
+                )}
               />
               {PRODUCE_KEYS.map(({ key, label, color }) => (
                 <Line
                   key={key}
                   type="monotone"
                   dataKey={key}
-                  name={label}
+                  name={t(label.toLowerCase())}
                   stroke={color}
                   strokeWidth={2}
                   activeDot={{ r: 6 }}

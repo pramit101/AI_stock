@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Sector } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Sector,
+} from "recharts";
+import { useTranslation } from "react-i18next";
 
 type ProduceDatum = { name: string; value: number };
 type TopProduceChartProps = {
@@ -9,10 +17,10 @@ type TopProduceChartProps = {
 };
 
 const FIXED_COLORS: Record<string, string> = {
-  Apples:   "#eb4031ff",
-  Bananas:  "#cedd2cff",
-  Cucumbers:"#3fa21fff",
-  Carrots:  "#ea9a10ff",
+  Apples: "#eb4031ff",
+  Bananas: "#cedd2cff",
+  Cucumbers: "#3fa21fff",
+  Carrots: "#ea9a10ff",
   Potatoes: "#4f3ee7ff",
   Tomatoes: "#bb27a7ff",
 };
@@ -29,13 +37,21 @@ function usePollingData(endpoint?: string, intervalMs = 4000) {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = (await res.json()) as ProduceDatum[];
         const cleaned = Array.isArray(json)
-          ? json.filter(d => d && typeof d.name === "string" && typeof d.value === "number")
+          ? json.filter(
+              (d) =>
+                d && typeof d.name === "string" && typeof d.value === "number"
+            )
           : [];
         setData(cleaned);
-      } catch {/* ignore */}
+      } catch {
+        /* ignore */
+      }
     };
     fetchOnce();
-    timerRef.current = window.setInterval(fetchOnce, intervalMs) as unknown as number;
+    timerRef.current = window.setInterval(
+      fetchOnce,
+      intervalMs
+    ) as unknown as number;
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
     };
@@ -45,11 +61,19 @@ function usePollingData(endpoint?: string, intervalMs = 4000) {
 }
 
 function isDark() {
-  return typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+  return (
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark")
+  );
 }
 
-export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduceChartProps) {
+export function TopProduceChart({
+  data,
+  endpoint,
+  intervalMs = 4000,
+}: TopProduceChartProps) {
   const polled = usePollingData(endpoint, intervalMs);
+  const { t } = useTranslation();
 
   const topProduceData = useMemo<ProduceDatum[]>(() => {
     if (data && data.length) return data;
@@ -68,7 +92,7 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
   const [activeIndex, setActiveIndex] = useState(0);
   useEffect(() => {
     if (!topProduceData.length) return;
-    setActiveIndex(i => Math.min(i, topProduceData.length - 1));
+    setActiveIndex((i) => Math.min(i, topProduceData.length - 1));
   }, [topProduceData]);
 
   const nameToColor = FIXED_COLORS; // lock colors to the palette you provided
@@ -89,7 +113,19 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
 
   const renderActiveShape = (props: any) => {
     const RADIAN = Math.PI / 180;
-    const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent, value } = props;
+    const {
+      cx,
+      cy,
+      midAngle,
+      innerRadius,
+      outerRadius,
+      startAngle,
+      endAngle,
+      fill,
+      payload,
+      percent,
+      value,
+    } = props;
     const sin = Math.sin(-RADIAN * midAngle);
     const cos = Math.cos(-RADIAN * midAngle);
     const sx = cx + (outerRadius + 10) * cos;
@@ -105,19 +141,57 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
 
     return (
       <g>
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill} className="text-xs font-medium">
+        <text
+          x={cx}
+          y={cy}
+          dy={8}
+          textAnchor="middle"
+          fill={fill}
+          className="text-xs font-medium"
+        >
           {payload.name}
         </text>
-        <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius}
-                startAngle={startAngle} endAngle={endAngle} fill={fill} />
-        <Sector cx={cx} cy={cy} startAngle={startAngle} endAngle={endAngle}
-                innerRadius={outerRadius + 6} outerRadius={outerRadius + 10} fill={fill} />
-        <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
+        <Sector
+          cx={cx}
+          cy={cy}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          fill={fill}
+        />
+        <Sector
+          cx={cx}
+          cy={cy}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          innerRadius={outerRadius + 6}
+          outerRadius={outerRadius + 10}
+          fill={fill}
+        />
+        <path
+          d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
+          stroke={fill}
+          fill="none"
+        />
         <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill={primaryText} className="text-xs">
+        <text
+          x={ex + (cos >= 0 ? 1 : -1) * 12}
+          y={ey}
+          textAnchor={textAnchor}
+          fill={primaryText}
+          className="text-xs"
+        >
           {`${value} units`}
         </text>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill={secondaryText} className="text-xs">
+        <text
+          x={ex + (cos >= 0 ? 1 : -1) * 12}
+          y={ey}
+          dy={18}
+          textAnchor={textAnchor}
+          fill={secondaryText}
+          className="text-xs"
+        >
           {`(${(percent * 100).toFixed(0)}%)`}
         </text>
       </g>
@@ -127,8 +201,10 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
   return (
     <div className="card rounded-xl shadow-lg h-full flex flex-col">
       <div className="p-4 border-b border-opacity-20 border-gray-300 dark:border-gray-600">
-        <h3 className="text-lg font-semibold">Popular Produce</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">By sales volume</p>
+        <h3 className="text-lg font-semibold">{t("popularProduce")}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t("bySalesVolume")}
+        </p>
       </div>
 
       <div className="p-4 flex-1 flex flex-col min-h-0">
@@ -150,20 +226,29 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
                   paddingAngle={2}
                 >
                   {topProduceData.map((entry, index) => (
-                    <Cell key={`cell-${entry.name}-${index}`} fill={nameToColor[entry.name] || "#999"} stroke="none" />
+                    <Cell
+                      key={`cell-${entry.name}-${index}`}
+                      fill={nameToColor[entry.name] || "#999"}
+                      stroke="none"
+                    />
                   ))}
                 </Pie>
-                <Tooltip formatter={(v: any) => [`${v} units`, "Sales"]} {...tooltipStyles} />
+                <Tooltip
+                  formatter={(v: any) => [`${v} units`, "Sales"]}
+                  {...tooltipStyles}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          
+
           {/* Legend table below the chart with compact spacing */}
           <div className="flex-shrink-0">
             <table className="min-w-full">
               <thead>
                 <tr>
-                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider py-1">Item</th>
+                  <th className="text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider py-1">
+                    {t("item")}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-opacity-20 divide-gray-300 dark:divide-gray-600">
@@ -177,9 +262,13 @@ export function TopProduceChart({ data, endpoint, intervalMs = 4000 }: TopProduc
                       <div className="flex items-center">
                         <span
                           className="h-2.5 w-2.5 rounded-full mr-2 flex-shrink-0"
-                          style={{ backgroundColor: nameToColor[item.name] || "#999" }}
+                          style={{
+                            backgroundColor: nameToColor[item.name] || "#999",
+                          }}
                         />
-                        <span className="text-xs font-medium truncate">{item.name}</span>
+                        <span className="text-xs font-medium truncate">
+                          {t(item.name.toLowerCase())}
+                        </span>
                       </div>
                     </td>
                   </tr>

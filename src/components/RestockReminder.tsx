@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircleIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type PercentMap = Record<string, number>;
 
@@ -62,6 +63,7 @@ export function RestockReminder({
   subtitle = "Lowest stock item",
 }: RestockReminderProps) {
   const polled = usePolledPercents(endpoint, intervalMs);
+  const { t } = useTranslation();
 
   // Source of truth: controlled > polled > fallback zeros for six standard items
   const percentMap = useMemo<PercentMap>(() => {
@@ -106,22 +108,24 @@ export function RestockReminder({
             className="text-red-600 dark:text-red-400 mr-2"
           />
           <h3 className="text-lg font-medium text-red-700 dark:text-red-300">
-            Urgent Restock Required
+            {t("urgentRestock")}
           </h3>
         </div>
-        <p className="text-xs text-red-600 dark:text-red-400">{subtitle}</p>
+        <p className="text-xs text-red-600 dark:text-red-400">
+          {t("lowestStockItem")}
+        </p>
       </div>
 
       <div className="p-4 flex-1 flex flex-col justify-center">
         <div className="text-center mb-2">
           <span className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            {lowest.name}
+            {t(lowest.name.toLowerCase())}
           </span>
         </div>
 
         <div className="flex justify-between text-sm mb-1">
           <span className="text-gray-700 dark:text-gray-300">
-            Current Stock
+            {t("currentStock")}
           </span>
           <span className="font-medium text-gray-900 dark:text-gray-100">
             {lowest.percent}%
@@ -136,7 +140,7 @@ export function RestockReminder({
         </div>
 
         <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          This item needs to be stocked.
+          {t("needsRestock")}
         </div>
       </div>
     </div>

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { AlertTriangle } from "lucide-react";
 import { SearchIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // Define Product type
 interface Product {
@@ -14,70 +13,62 @@ interface Product {
 // Map product names to real images
 const productImages: { [key: string]: string } = {
   Banana:
-    "https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?w=600&auto=format&fit=crop&q=60",
+    "https://images.unsplash.com/photo-1587334206596-c0f9f7dccbe6?w=400&auto=format&fit=crop&q=80",
   Apple:
-    "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&w=1024&q=80",
+    "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&auto=format&fit=crop&q=80",
   Cucumber:
-    "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=600&auto=format&fit=crop&q=60",
-  Tomato:
-    "https://plus.unsplash.com/premium_photo-1726138646616-ec9fb0277048?w=600&auto=format&fit=crop&q=60",
+    "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=400&auto=format&fit=crop&q=80",
+  Tomatoe:
+    "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&auto=format&fit=crop&q=80",
   Carrot:
-    "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=600&auto=format&fit=crop&q=60",
-  Potato:
-    "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&auto=format&fit=crop&q=60",
+    "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=400&auto=format&fit=crop&q=80",
+  Potatoe:
+    "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&auto=format&fit=crop&q=80",
 };
 
 export default function Inventory() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const { t } = useTranslation();
 
   const [products] = useState<Product[]>([
-    { name: "Banana", category: "Fruits", stock: 65 },
-    { name: "Apple", category: "Fruits", stock: 75 },
-    { name: "Cucumber", category: "Vegetables", stock: 40 },
-    { name: "Tomato", category: "Vegetables", stock: 55 },
-    { name: "Carrot", category: "Vegetables", stock: 20 },
-    { name: "Potato", category: "Vegetables", stock: 25 },
+    { name: "Bananas", category: "Fruits", stock: 65 },
+    { name: "Apples", category: "Fruits", stock: 75 },
+    { name: "Cucumbers", category: "Vegetables", stock: 40 },
+    { name: "Tomatoes", category: "Vegetables", stock: 55 },
+    { name: "Carrots", category: "Vegetables", stock: 20 },
+    { name: "Potatoes", category: "Vegetables", stock: 25 },
   ]);
 
   const handleProductClick = (product: Product) => {
     // Navigate to the individual product page
     let productRoute = product.name.toLowerCase();
     
-    // Handle special plural cases
-    if (product.name === 'Potato') {
+    // Handle special plural cases - convert to singular first, then add 's'
+    if (product.name === 'Potatoes') {
       productRoute = 'potatoes';
-    } else if (product.name === 'Tomato') {
+    } else if (product.name === 'Tomatoes') {
       productRoute = 'tomatoes';
-    } else {
-      productRoute += 's'; // Add 's' to make plural for other products
+    } else if (product.name === 'Bananas') {
+      productRoute = 'bananas';
+    } else if (product.name === 'Apples') {
+      productRoute = 'apples';
+    } else if (product.name === 'Cucumbers') {
+      productRoute = 'cucumbers';
+    } else if (product.name === 'Carrots') {
+      productRoute = 'carrots';
     }
     
     navigate(`/inventory/${productRoute}`);
   };
 
-  const pieChartData = products.map((product) => ({
-    name: product.name,
-    value: product.stock,
-  }));
 
-  const COLORS = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff7300",
-    "#8dd1e1",
-    "#d084d0",
-  ];
-  const lowStockProducts = products.filter((product) => product.stock <= 30);
-  
   const filteredList = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Inventory</h1>
       <div className="flex mb-10 w-96 ml-7 items-center border border-gray-400 dark:border-gray-700 rounded-md bg-gray-100 dark:bg-gray-800 px-3 py-2">
         <SearchIcon size={16} className="text-gray-500 dark:text-gray-400" />
         <input
@@ -89,111 +80,29 @@ export default function Inventory() {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Product cards */}
-        <div className="flex-1">
-          <div className="grid grid-cols-3 gap-6">
-            {filteredList.map((p, index) => (
-              <button
-                key={index}
-                onClick={() => handleProductClick(p)}
-                className="card rounded-lg p-4 text-center hover:shadow-lg transition-shadow flex flex-col justify-between mx-auto"
-                style={{ width: "200px", height: "230px" }}
-                aria-label={`View details for ${p.name}`}
-              >
-                <div className="flex-1 flex items-center justify-center">
-                  <img
-                    src={productImages[p.name]}
-                    alt={p.name}
-                    className="product-image object-cover rounded-lg"
-                    style={{ width: "125px", height: "125px" }}
-                  />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{p.name}</h3>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Right sidebar */}
-        <div className="w-full lg:w-80 space-y-6">
-          {/* Pie chart */}
-          <div className="card rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
-              Product Stock Levels
+      {/* Product cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8">
+        {filteredList.map((p, index) => (
+          <button
+            key={index}
+            onClick={() => handleProductClick(p)}
+            className="card rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 flex flex-col justify-between mx-auto hover:scale-105"
+            style={{ width: "180px", height: "220px" }}
+            aria-label={`View details for ${p.name}`}
+          >
+            <div className="flex-1 flex items-center justify-center">
+              <img
+                src={productImages[p.name.slice(0, -1)]}
+                alt={p.name}
+                className="product-image object-cover rounded-xl shadow-md"
+                style={{ width: "140px", height: "140px" }}
+              />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mt-2">
+              {t(p.name.toLowerCase())}
             </h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieChartData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
-                    outerRadius={80}
-                    dataKey="value"
-                  >
-                    {pieChartData.map((_, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Low stock alerts */}
-          <div className="card rounded-lg p-4">
-            <div className="flex items-center mb-4">
-              <AlertTriangle className="text-red-500 mr-2" size={20} />
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                Low Stock Alert
-              </h3>
-            </div>
-
-            {lowStockProducts.length > 0 ? (
-              <div className="space-y-3">
-                {lowStockProducts.map((product, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border-l-4 border-red-500"
-                  >
-                    <div className="flex items-center">
-                      <img
-                        src={productImages[product.name]}
-                        alt={product.name}
-                        className="product-image w-10 h-10 rounded-lg mr-3"
-                      />
-                      <div>
-                        <p className="font-medium text-gray-800 dark:text-gray-100">
-                          {product.name}
-                        </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {product.category}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-red-600 dark:text-red-400">{product.stock}%</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Shelf Level</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-gray-500 dark:text-gray-400">All products are well stocked!</p>
-              </div>
-            )}
-          </div>
-        </div>
+          </button>
+        ))}
       </div>
     </div>
   );
