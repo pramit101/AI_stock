@@ -198,26 +198,26 @@ export default function Upload() {
       );
     } else {
       previewContent = (
-        <div className="w-full h-40 flex items-center justify-center bg-slate-950 rounded-t-lg text-center text-slate-500">
+        <div className="w-full h-40 flex items-center justify-center bg-gray-200 dark:bg-gray-800 rounded-t-lg text-center text-gray-500 dark:text-gray-400">
           Unsupported file
         </div>
       );
     }
 
     return (
-      <div className="file-preview-card group w-48 h-56 relative bg-slate-900 rounded-lg shadow-md overflow-hidden transition-all duration-300 transform hover:scale-105 hover:border-purple-500 border-2 border-transparent">
+      <div className="file-preview-card group w-48 h-56 relative card rounded-lg shadow-md overflow-hidden transition-all duration-300 transform hover:scale-105 hover:border-purple-500 border-2 border-transparent">
         {previewContent}
         <div className="p-4">
-          <p className="text-sm font-semibold text-slate-200 truncate">
+          <p className="text-sm font-semibold main truncate">
             {file.name}
           </p>
-          <p className="text-xs text-slate-400">{`${(
+          <p className="text-xs text-gray-500 dark:text-gray-400">{`${(
             file.size /
             1024 /
             1024
           ).toFixed(2)} MB`}</p>
         </div>
-        <div className="overlay absolute top-0 left-0 w-full h-full bg-slate-950 bg-opacity-80 flex items-center justify-center">
+        <div className="overlay absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center">
           <button
             onClick={() => handleRemoveFile(file)}
             className="remove-file-btn p-2 bg-red-600 rounded-full text-white hover:bg-red-700 transition-colors duration-200"
@@ -230,11 +230,11 @@ export default function Upload() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen main">
       <div className="flex flex-col flex-1">
         {notification && <Notification message={notification} />}
         <main className="flex flex-col items-center justify-center p-3 h-full ">
-          <h2 className="text-2xl font-semibold text-gray-700">
+          <h2 className="text-2xl font-semibold main">
             {t("uploadProducePrompt")}
           </h2>
 
@@ -244,8 +244,8 @@ export default function Upload() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`border-2 border-dashed ${
-              isDragging ? "border-purple-500 bg-slate-300" : "border-gray-300"
-            } rounded-lg p-6 mt-6 flex flex-col items-center justify-between w-full max-w-4xl h-96 cursor-pointer`}
+              isDragging ? "border-purple-500 bg-purple-100 dark:bg-purple-900/20" : "border-gray-300 dark:border-gray-600"
+            } rounded-lg p-6 mt-6 flex flex-col items-center justify-between w-full max-w-4xl h-96 cursor-pointer card`}
           >
             <div className="flex-1 flex items-center justify-center">
               <input
@@ -256,7 +256,7 @@ export default function Upload() {
                 accept=".jpg,.jpeg,.png,.heic,.webp,video/*"
                 onChange={handleInputChange}
               />
-              <button className="mt-4 px-4 py-2 bg-gray-300 text-white text-5xl rounded hover:bg-blue-700">
+              <button className="mt-4 px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-5xl rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
                 <FontAwesomeIcon icon={faUpload} />
               </button>
             </div>
@@ -270,11 +270,11 @@ export default function Upload() {
                 disabled={UploadFiles.length === 0 || isUploading}
                 className={`w-full sm:w-auto px-8 py-4 transition-colors duration-300 text-white font-bold rounded-xl shadow-lg flex items-center justify-center space-x-2 ${
                   UploadFiles.length === 0 || isUploading
-                    ? "bg-gray-500 shadow-none"
-                    : "bg-violet-600 hover:bg-violet-700 shadow-violet-500/30"
+                    ? "bg-gray-500 dark:bg-gray-600 shadow-none"
+                    : "bg-violet-600 hover:bg-violet-700 dark:bg-violet-700 dark:hover:bg-violet-800 shadow-violet-500/30"
                 } ${
                   uploadStatus === "success"
-                    ? "bg-green-600 hover:bg-green-700 shadow-green-500/30"
+                    ? "bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 shadow-green-500/30"
                     : ""
                 }`}
               >

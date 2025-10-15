@@ -32,6 +32,52 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* Fix overscroll background to match landing page theme */
+html {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+  min-height: 100vh;
+  height: 100%;
+}
+
+/* Ensure root element also has the correct background */
+#root {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+  min-height: 100vh;
+}
+
+body {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Ensure overscroll areas match the landing page theme */
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+  background: linear-gradient(to bottom right, #020617, #0c1e3d, #020617);
+}
+
+body::-webkit-scrollbar-thumb {
+  background: rgba(96, 165, 250, 0.5);
+  border-radius: 4px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: rgba(96, 165, 250, 0.7);
+}
+
+/* Fix for mobile overscroll bounce */
+@supports (-webkit-overflow-scrolling: touch) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 .dark {
   /* Dark Mode Colors */
   --sidebar-bg: #0f172a;
@@ -104,12 +150,21 @@
   color: var(--input-placeholder);
 }
 
+/* Product Image Dark Mode Support */
+.product-image {
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.dark .product-image {
+  filter: brightness(0.85) contrast(1.1);
+  opacity: 0.95;
+}
+
 /* 🔑 Apply global font + size */
 body {
   font-family: var(--app-font-family, sans-serif);
   font-size: var(--app-font-size, 16px);
 }
-
 
 /* Smooth transitions for theme switching */
 * {
@@ -132,4 +187,122 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--sidebar-active);
+}
+
+/* Fix dark mode scrolling background */
+html {
+  background-color: var(--main-bg);
+}
+
+body {
+  background-color: var(--main-bg);
+}
+
+/* Ensure modal backgrounds are properly styled in dark mode */
+.dark .fixed {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Fix any white backgrounds that might appear during scrolling */
+.dark * {
+  scrollbar-color: var(--sidebar-hover) var(--main-bg);
+}
+
+/* Ensure all containers respect dark mode */
+.dark .overflow-y-auto,
+.dark .overflow-auto {
+  background-color: var(--main-bg);
+}
+
+/* Print/PDF specific styles for better output */
+@media print {
+  /* Hide elements that shouldn't appear in PDF */
+  .export-buttons,
+  .no-print,
+  button[class*="export"],
+  .modal-backdrop {
+    display: none !important;
+  }
+  
+  /* Optimize modal for print */
+  .modal {
+    position: static !important;
+    transform: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* Ensure charts render properly */
+  .chart-container,
+  .h-64,
+  .h-48 {
+    height: auto !important;
+    min-height: 300px !important;
+    page-break-inside: avoid;
+  }
+  
+  /* Better text rendering */
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Force white background for all elements in print */
+  * {
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Ensure proper spacing */
+  .space-y-6 > * + * {
+    margin-top: 1.5rem !important;
+  }
+  
+  .space-y-4 > * + * {
+    margin-top: 1rem !important;
+  }
+  
+  /* Page breaks */
+  .page-break-before {
+    page-break-before: always;
+  }
+  
+  .page-break-after {
+    page-break-after: always;
+  }
+  
+  .no-page-break {
+    page-break-inside: avoid;
+  }
+  
+  /* Chart optimization */
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Grid layouts for print */
+  .grid {
+    display: block !important;
+  }
+  
+  .grid > * {
+    display: block !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* Additional PDF-specific styles for html2pdf */
+.pdf-optimized {
+  background: white !important;
+  color: black !important;
+}
+
+.pdf-optimized * {
+  background: white !important;
+  color: black !important;
 }

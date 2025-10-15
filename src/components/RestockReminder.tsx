@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircleIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -60,7 +60,6 @@ export function RestockReminder({
   percents,
   endpoint,
   intervalMs = 5000,
-  subtitle = "Lowest stock item",
 }: RestockReminderProps) {
   const polled = usePolledPercents(endpoint, intervalMs);
   const { t } = useTranslation();
@@ -94,14 +93,14 @@ export function RestockReminder({
   if (!lowest) {
     return (
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-        No items to display
+        {t("noItemsToDisplay")}
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow h-full flex flex-col text-gray-900 dark:text-gray-100">
-      <div className="p-3 border-b border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/50 rounded-t-lg">
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow h-full flex flex-col text-gray-900 dark:text-gray-100">
+      <div className="p-3 border-b border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 rounded-t-lg">
         <div className="flex items-center">
           <AlertCircleIcon
             size={20}
@@ -132,9 +131,9 @@ export function RestockReminder({
           </span>
         </div>
 
-        <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-4 mb-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-2">
           <div
-            className="h-4 rounded-full bg-red-500"
+            className="h-4 rounded-full bg-red-500 dark:bg-red-600"
             style={{ width: `${lowest.percent}%` }}
           />
         </div>

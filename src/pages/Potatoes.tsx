@@ -5,9 +5,11 @@ import { Package, ArrowLeft } from "lucide-react";
 import { SingleProduceChart } from "../components/SingleProduceChart";
 import { CurrentStockLevel } from "../components/CurrentStockLevel";
 import { RestockActions } from "../components/RestockActions";
+import { useTranslation } from "react-i18next";
 
 export function Potatoes() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [stockLevel] = useState(0); // Set to 0 as requested
 
   return (
@@ -20,7 +22,7 @@ export function Potatoes() {
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
           >
             <ArrowLeft size={20} />
-            <span>Back to Inventory</span>
+            <span>{t("backToInventory")}</span>
           </button>
         </div>
         
@@ -32,8 +34,8 @@ export function Potatoes() {
           </div>
           
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Potatoes</h1>
-            <p className="text-gray-600 dark:text-gray-400">Fresh Brown Potatoes - Inventory Management</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t("potatoes")}</h1>
+            <p className="text-gray-600 dark:text-gray-400">{t("freshRedApples")}</p>
           </div>
         </div>
       </div>
@@ -69,39 +71,39 @@ export function Potatoes() {
         <div className="space-y-6">
           {/* Product Details Card - Same height as Stock Trends */}
           <div className="card rounded-xl shadow-lg h-80 p-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Product Details</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("productDetails")}</h3>
             
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Category:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">Fresh Produce</span>
+                <span className="text-gray-600 dark:text-gray-400">{t("category")}:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">{t("freshProduce")}</span>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Variety:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">Russet</span>
+                <span className="text-gray-600 dark:text-gray-400">{t("variety")}:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">{t("russet")}</span>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Storage:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">Cool, Dark Place</span>
+                <span className="text-gray-600 dark:text-gray-400">{t("storage")}:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">{t("coolDarkPlace")}</span>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Shelf Life:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">2-3 months</span>
+                <span className="text-gray-600 dark:text-gray-400">{t("shelfLife")}:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">{t("twoToThreeMonths")}</span>
               </div>
               
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Last Updated:</span>
-                <span className="font-medium text-gray-900 dark:text-gray-100">6 hours ago</span>
+                <span className="text-gray-600 dark:text-gray-400">{t("lastUpdated")}:</span>
+                <span className="font-medium text-gray-900 dark:text-gray-100">{t("sixHoursAgo")}</span>
               </div>
             </div>
           </div>
 
           {/* Recent Activity Card - Scrollable and same ending point as Restock Actions */}
           <div className="card rounded-xl shadow-lg h-[660px] p-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Recent Activity</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("recentActivity")}</h3>
             
             <div className="h-64 overflow-y-auto">
               {/* Initially blank as requested - no activities yet */}
