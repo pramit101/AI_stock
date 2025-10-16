@@ -36,6 +36,9 @@ const resources = {
       report: "Report",
       standard: "Standard",
       uploadProducePrompt: "Upload pictures or videos of your produce here.",
+      Upload: "Upload Images",
+      drag: "Click or drag files to upload",
+      cctv: "Use CCTV Footage",
 
       name: "Name",
       email: "Email",
@@ -231,6 +234,9 @@ const resources = {
       noItemsToDisplay: "没有要显示的项目",
       areCriticallyLow: "严重不足，仅剩",
       chartWillBeRenderedHere: "图表将在此处渲染",
+      Upload: "上传图片",
+      drag: "点击或拖动文件上传",
+      cctv: "使用闭路电视录像",
 
       name: "姓名",
       email: "电子邮件",
@@ -438,6 +444,9 @@ const resources = {
       dangerZone: "Zona peligrosa",
       deleteAccount: "Eliminar cuenta",
       accountCreated: "Cuenta creada el",
+      Upload: "Subir imágenes",
+      drag: "Haga clic o arrastre archivos para subir",
+      cctv: "Usar grabaciones de CCTV",
 
       language: "Idioma",
       fontSize: "Tamaño de fuente",
@@ -635,6 +644,9 @@ const resources = {
       dangerZone: "Zone dangereuse",
       deleteAccount: "Supprimer le compte",
       accountCreated: "Compte créé le",
+      Upload: "Téléverser des images",
+      drag: "Cliquez ou faites glisser les fichiers à télécharger",
+      cctv: "Utiliser les images CCTV",
 
       language: "Langue",
       fontSize: "Taille de police",
@@ -786,6 +798,9 @@ const resources = {
       areCriticallyLow: "منخفضة بشكل حرج عند",
       report: "تقرير",
       uploadProducePrompt: "قم بتحميل صور أو مقاطع فيديو لمنتجاتك هنا.",
+      Upload: "تحميل الصور",
+      drag: "انقر أو اسحب الملفات للتحميل",
+      cctv: "استخدام تسجيلات CCTV",
 
       name: "الاسم",
       email: "البريد الإلكتروني",
@@ -861,6 +876,9 @@ const resources = {
       areCriticallyLow: "estão criticamente baixos em",
       report: "Relatório",
       uploadProducePrompt: "Envie fotos ou vídeos dos seus produtos aqui.",
+      Upload: "Enviar imagens",
+      drag: "Clique ou arraste arquivos para enviar",
+      cctv: "Usar gravações de CCTV",
 
       name: "Nome",
       email: "E-mail",
@@ -936,6 +954,9 @@ const resources = {
       areCriticallyLow: "критически низкий на",
       report: "Отчет",
       uploadProducePrompt: "Загрузите здесь фотографии или видео вашей продукции.",
+      Upload: "Загрузить изображения",
+      drag: "Нажмите или перетащите файлы для загрузки",
+      cctv: "Использовать записи с камер наблюдения",
 
       name: "Имя",
       email: "Электронная почта",
@@ -1011,6 +1032,9 @@ const resources = {
       areCriticallyLow: "が危機的に低く",
       report: "レポート",
       uploadProducePrompt: "ここにあなたの農産物の写真やビデオをアップロードしてください。",
+      Upload: "画像をアップロード",
+      drag: "クリックまたはドラッグしてファイルをアップロード",
+      cctv: "CCTVの映像を使用",
 
       name: "名前",
       email: "メール",
@@ -1086,6 +1110,9 @@ const resources = {
       areCriticallyLow: "sind kritisch niedrig bei",
       report: "Bericht",
       uploadProducePrompt: "Laden Sie hier Bilder oder Videos Ihrer Produkte hoch.",
+      Upload: "Bilder hochladen",
+      drag: "Klicken oder ziehen Sie Dateien zum Hochladen",
+      cctv: "CCTV-Aufnahmen verwenden",
 
       name: "Name",
       email: "E-Mail",
@@ -1169,6 +1196,9 @@ const resources = {
       accountCreated: "खाता बनाया गया",
       report: "रिपोर्ट",
       uploadProducePrompt: "यहाँ अपने फलों और सब्ज़ियों की तस्वीरें या वीडियो अपलोड करें।",
+      Upload: "छवियाँ अपलोड करें",
+      drag: "अपलोड करने के लिए फ़ाइलों पर क्लिक करें या उन्हें खींचें",
+      cctv: "CCTV रिकॉर्डिंग का उपयोग करें",
 
       language: "भाषा",
       fontSize: "फ़ॉन्ट आकार",
@@ -1244,6 +1274,9 @@ const resources = {
       accountCreated: "Akaunti iliyoanzishwa tarehe",
       report: "Ripoti",
       uploadProducePrompt: "Pakia hapa picha au video za mazao yako.",  
+      Upload: "Pakia picha",
+      drag: "Bonyeza au buruta faili kupakia",
+      cctv: "Tumia rekodi za CCTV",
 
       language: "Lugha",
       fontSize: "Ukubwa wa Fonti",
@@ -1318,6 +1351,9 @@ const resources = {
       accountCreated: "खाता सिर्जना गरिएको",
       report: "रिपोर्ट",
       uploadProducePrompt: "यहाँ तपाईंको फलफूल र तरकारीका तस्बिर वा भिडियोहरू अपलोड गर्नुहोस्।",
+      Upload: "तस्बिरहरू अपलोड गर्नुहोस्",
+      drag: "अपलोड गर्न फाइलहरूमा क्लिक गर्नुहोस् वा तान्नुहोस्",
+      cctv: "CCTV रेकर्डिङहरू प्रयोग गर्नुहोस्",
 
       language: "भाषा",
       fontSize: "फन्ट आकार",
