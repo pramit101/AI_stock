@@ -59,10 +59,8 @@ export default function Upload() {
 
   // CCTV stream and capture setup
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const captureCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const playerRef = useRef<any>(null);
   const snapshotIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const hasFrameRef = useRef(false);
 
   // Handle files (from manual upload or snapshots)
   const handleFiles = useCallback(async (files: FileList | File[]) => {
