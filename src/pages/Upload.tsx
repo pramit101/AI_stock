@@ -272,7 +272,7 @@ export default function Upload() {
           }`}
         >
           <FontAwesomeIcon icon={faUpload} className="mr-2" />
-          Upload Images
+          {t("Upload")}
         </button>
         <button
           onClick={() => setMode("cctv")}
@@ -283,7 +283,7 @@ export default function Upload() {
           }`}
         >
           <FontAwesomeIcon icon={faVideo} className="mr-2" />
-          Use CCTV Footage
+          {t("cctv")}
         </button>
       </div>
 
@@ -312,7 +312,7 @@ export default function Upload() {
               icon={faUpload}
               className="text-5xl mb-3 text-gray-600"
             />
-            <p className="text-gray-700">Click or drag files to upload</p>
+            <p className="text-gray-700">{t("drag")}</p>
           </div>
         </>
       ) : (
