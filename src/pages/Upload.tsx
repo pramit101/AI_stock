@@ -166,7 +166,7 @@ export default function Upload() {
 
           snapshotIntervalRef.current = setInterval(() => {
             captureSnapshot();
-          }, 10000);
+          }, 60000);
         }
       }, 500);
     }
@@ -338,7 +338,7 @@ export default function Upload() {
             </div>
           </div>
           <p className="mt-3 text-sm text-gray-600">
-            Snapshots captured automatically every 10 seconds
+            Snapshots captured automatically every minute.
           </p>
         </>
       )}
